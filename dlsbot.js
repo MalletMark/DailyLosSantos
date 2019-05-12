@@ -20,7 +20,7 @@ client.on('message', message => {
 
     if (message.author.username == "Pixstrad" && weedWords.some(word => message.content.includes(word)))
     {
-        const qChannel = message.guild.channels.find(ch => ch.name === "test");
+        const qChannel = message.guild.channels.find(ch => ch.name === "reporters-only");
         var weedSince = Math.round((Date.now() - weedDate) / 1000);
         console.log(weedSince);
         message.channel.send("It's been " + weedSince.toString() + " seconds since Pixtrad has mentioned weed.");

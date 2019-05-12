@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const { Client, RichEmbed } = require('discord.js');
@@ -6,7 +8,7 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
-client.login('NTc1NTY5NTM5MDI3MzA0NDQ4.XNcnQQ.t8Yf9DBR_trSConpYsRvqBkAP9A');
+client.login(process.env.API_CLIENT_TOKEN);
 
 client.on('message', message => {
     if (message.content === '!testbot'){
@@ -16,7 +18,7 @@ client.on('message', message => {
     if (message.content.substring(0, 6) === '!quote' &&
        (message.content.match(/@/g) || []).length == 2)
     {
-        const qChannel = message.guild.channels.find(ch => ch.name === 'quote-test');
+        const qChannel = message.guild.channels.find(ch => ch.id === process.env.QUOTE_CHANNEL_ID);
         if (!qChannel) return;
 
         var fullmsg = message.content;

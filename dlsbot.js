@@ -23,7 +23,7 @@ client.on('message', message => {
         const qChannel = message.guild.channels.find(ch => ch.name === "reporters-only");
         var weedSince = Math.round((Date.now() - weedDate) / 1000);
         console.log(weedSince);
-        message.channel.send("It's been " + weedSince.toString() + " seconds since Pixtrad has mentioned weed.");
+        qChannel.channel.send("It's been " + weedSince.toString() + " seconds since Pixstrad has mentioned weed.");
         weedDate = Date.now();
     }
 

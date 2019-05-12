@@ -1,0 +1,33 @@
+{
+  "name": "dls",
+  "version": "1.0.0",
+  "description": "TheDailyLosSantos",
+  "main": "index.js",
+  "scripts": {
+    "test": "helloworld"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MalletMark/thedailylossantos.git"
+  },
+  "keywords": [
+    "discord",
+    "gta",
+    "rp",
+    "thedailylossantos"
+  ],
+  "author": "Mark Real",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MalletMark/thedailylossantos/issues"
+  },
+  "homepage": "https://github.com/MalletMark/thedailylossantos#readme",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "eslint": "^5.16.0",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}

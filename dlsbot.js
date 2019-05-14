@@ -29,7 +29,7 @@ client.on('message', message => {
         message.channel.send('works');
     }
 
-    if (message.content.toLowerCase().indexOf.indexOf('uchiha'))
+    if (message.content.toLowerCase().indexOf('uchiha') > 0)
     {
         message.channel.send('Fucko!');
     }

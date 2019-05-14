@@ -26,17 +26,22 @@ function hasReaction(reactions, emojiName)
 
 client.on('message', message => {
     if (message.content === '!testbot'){
-        message.channel.send('works')
+        message.channel.send('works');
+    }
+
+    if (message.content.toLowerCase().indexOf.indexOf('uchiha'))
+    {
+        message.channel.send('Fucko!');
     }
 
     if (message.content.substring(0,6) === '!recap')
     {
-        var recapNum = Number(message.content.substring(7));
+        var recapNum = Number(message.content.substring(7)) || 1;
         var rCount = 0;
         console.log(recapNum);
         var messagesQueue = [];
 
-        message.channel.fetchMessages({limit: 100})
+        message.channel.fetchMessages()
         .then(messages => {
             messages.array().every(function(m)
             {
@@ -47,17 +52,21 @@ client.on('message', message => {
                     return true;
                 }
                 return true;
-            })
-
+            });
+        }).then(messages => {
             if (messagesQueue.length > 0)
             {
-                recapNum = (recapNum > messagesQueue.length) ? messagesQueue.length : recapNum;
-                message.channel.send('Here are the last ' + recapNum.toString() + ' recaps I could find!')
+                var rc = (messagesQueue.length > 1) ? messagesQueue.length.toString() + ' recaps' : 'recap'
+                message.channel.send(`Here are the last ${rc} I could find!`)
                 messagesQueue.reverse();
                 messagesQueue.forEach(function(m)
                 {
                     m.channel.send(m.url);
                 })
+            }
+            else
+            {
+                message.channel.send('No recaps found in the last 100 messages :(');
             }
         });
     }
@@ -65,9 +74,21 @@ client.on('message', message => {
     if (message.author.username == "Pixstrad" && weedWords.some(word => message.content.includes(word)))
     {
         const qChannel = message.guild.channels.find(ch => ch.name === "reporters-only");
-        var weedSince = Math.round((Date.now() - weedDate) / 1000);
-        console.log(weedSince);
-        qChannel.send("It's been " + weedSince.toString() + " seconds since Pixstrad has mentioned weed.");
+        var wSeconds = Math.round((Date.now() - weedDate) / 1000);
+        var wDays = Math.floor(wSeconds / 86400);
+        wSeconds -= wDays*86400;
+        var wHours = Math.floor(wSeconds / 3600);
+        wSeconds -= wHours*3600;
+        var wMinutes = Math.floor(wSeconds / 60);
+        wSeconds -= wMinutes * 60;
+
+        var wSince = [];
+        if (wDays > 0) wSince.push(`${wDays} days`);
+        if (wHours > 0) wSince.push(`${wHours} hours`);
+        if (wMinutes > 0) wSince.push(`${wMinutes} minutes`);
+        if (wSeconds > 0) wSince.push(`${wSeconds} seconds`);
+
+        qChannel.send("It's been " + wSince.join(' ') + " since Pixstrad has mentioned weed.");
         weedDate = Date.now();
     }
 

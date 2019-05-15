@@ -29,10 +29,10 @@ client.on('message', message => {
         message.channel.send('works');
     }
 
-    if (message.content.toLowerCase().indexOf('uchiha') > 0)
-    {
-        message.channel.send('Fucko!');
-    }
+    // if (message.content.toLowerCase().indexOf('uchiha') > 0)
+    // {
+    //     message.channel.send('Fucko!');
+    // }
 
     if (message.content.substring(0,6) === '!recap')
     {

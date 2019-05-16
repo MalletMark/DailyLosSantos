@@ -24,49 +24,66 @@ function hasReaction(reactions, emojiName)
     return false;
 }
 
+async function fetchRecaps(channel, recapNum) {
+    const messagesQueue = [];
+    let last_id;
+    let rCount = 0;
+
+    while (rCount < recapNum)
+    {
+        const options = { limit : 100 };
+        if (last_id) {
+            options.before = last_id;
+        }
+
+        const messages = await channel.fetchMessages(options);
+        messages.array().every(function(m)
+        {
+            if (hasReaction(m.reactions.array(), 'recap'))
+            {
+                if (++rCount > recapNum) return false;
+                messagesQueue.push(m);
+                return true;
+            }
+            return true;
+        });
+        last_id = messages.last().id;
+
+        if (messages.size != 100 || rCount > recapNum) {
+            break;
+        }
+    }
+
+    return messagesQueue;
+}
+
 client.on('message', message => {
     if (message.content === '!testbot'){
         message.channel.send('works');
     }
 
-    if (message.content.toLowerCase().indexOf('uchiha') > 0)
-    {
-        message.channel.send('Fucko!');
-    }
-
     if (message.content.substring(0,6) === '!recap')
     {
-        var recapNum = Number(message.content.substring(7)) || 1;
-        var rCount = 0;
-        console.log(recapNum);
-        var messagesQueue = [];
+        const recapNum = 10;
 
-        message.channel.fetchMessages()
-        .then(messages => {
-            messages.array().every(function(m)
-            {
-                if (hasReaction(m.reactions.array(), 'recap'))
-                {
-                    if (++rCount > recapNum) return false;
-                    messagesQueue.push(m);
-                    return true;
-                }
-                return true;
-            });
-        }).then(messages => {
+        fetchRecaps(message.channel, recapNum)
+        .then(messagesQueue => {
             if (messagesQueue.length > 0)
             {
-                var rc = (messagesQueue.length > 1) ? messagesQueue.length.toString() + ' recaps' : 'recap'
-                message.channel.send(`Here are the last ${rc} I could find!`)
                 messagesQueue.reverse();
-                messagesQueue.forEach(function(m)
-                {
-                    m.channel.send(m.url);
-                })
+                const rc = (messagesQueue.length > 1) ? messagesQueue.length.toString() + ' recaps' : 'recap'
+                const messagesFormatted = messagesQueue.map(m => `[${m.content.substring(0, 10)}...](${m.url})`);
+
+                const embed = new RichEmbed()
+                .setTitle(`Here are the last ${rc} I could find!`)
+                .setColor(0x0008FF)
+                .setDescription(messagesFormatted.join('\n'));
+
+                message.channel.send(embed);
             }
             else
             {
-                message.channel.send('No recaps found in the last 100 messages :(');
+                message.channel.send('No recaps found :(');
             }
         });
     }
@@ -110,3 +127,42 @@ client.on('message', message => {
         qChannel.send(embed);
     }
 });
+
+/*
+    if (message.content.substring(0,6) === '!recap')
+    {
+        var recapNum = Number(message.content.substring(7)) || 1;
+        var rCount = 0;
+        console.log(recapNum);
+        var messagesQueue = [];
+
+        message.channel.fetchMessages()
+        .then(messages => {
+            messages.array().every(function(m)
+            {
+                if (hasReaction(m.reactions.array(), 'recap'))
+                {
+                    if (++rCount > recapNum) return false;
+                    messagesQueue.push(m);
+                    return true;
+                }
+                return true;
+            });
+        }).then(messages => {
+            if (messagesQueue.length > 0)
+            {
+                var rc = (messagesQueue.length > 1) ? messagesQueue.length.toString() + ' recaps' : 'recap'
+                message.channel.send(`Here are the last ${rc} I could find!`)
+                messagesQueue.reverse();
+                messagesQueue.forEach(function(m)
+                {
+                    m.channel.send(m.url);
+                })
+            }
+            else
+            {
+                message.channel.send('No recaps found in the last 100 messages :(');
+            }
+        });
+    }
+*/

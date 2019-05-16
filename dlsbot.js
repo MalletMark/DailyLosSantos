@@ -72,7 +72,7 @@ client.on('message', message => {
             {
                 messagesQueue.reverse();
                 const rc = (messagesQueue.length > 1) ? messagesQueue.length.toString() + ' recaps' : 'recap'
-                const messagesFormatted = messagesQueue.map(m => `[${m.content.substring(0, 10)}...](${m.url})`);
+                const messagesFormatted = messagesQueue.map(m => `[${m.content.substring(0, 20)}...](${m.url})`);
 
                 const embed = new RichEmbed()
                 .setTitle(`Here are the last ${rc} I could find!`)

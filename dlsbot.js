@@ -19,40 +19,25 @@ client.once('ready', () => {
 client.login(process.env.API_CLIENT_TOKEN);
 
 client.on('message', message => {
-    if (message.content === '!testbot'){
+    if (message.content === '!testbot') {
         message.channel.send('works');
-    }
-
-    if (message.content.substring(0, 11) === '!character ')
-    {
+    } else if (message.content.substring(0, 11) === '!character ') {
         characterBot(message);
-    }
-
-    if (message.content.substring(0, 16) === '!characterUpdate')
-    {
+    } else if (message.content.substring(0, 16) === '!characterUpdate') {
         characterBotUpdate(message);
-    }
-
-    if (message.content.substring(0, 13) === '!characterAdd')
-    {
+    } else if (message.content.substring(0, 13) === '!characterAdd') {
         characterBotAdd(message);
-    }
-
-    if (message.content.substring(0,6) === '!recap')
-    {
+    } else if (message.content.substring(0,6) === '!recap') {
         recapBot(message);
+    } else if (message.content.substring(0, 6) === '!quote' &&
+        message.content.indexOf('<') > 0 && 
+        message.content.indexOf('>') > 0) {
+        quoteBot(message, process.env.QUOTE_CHANNEL_ID);
     }
 
     if (message.author.username == "Pixstrad" && weedWords.some(word => message.content.includes(word)))
     {
         pixBot(message);
-    }
-
-    if (message.content.substring(0, 6) === '!quote' &&
-        message.content.indexOf('<') > 0 && 
-        message.content.indexOf('>') > 0)
-    {
-        quoteBot(message, process.env.QUOTE_CHANNEL_ID);
     }
 });
 
@@ -62,7 +47,7 @@ function characterBot(message) {
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('nopixel_characters');
 
-        col.find({ name: {'$regex': cName}}).toArray(function(err, items) {
+        col.find({ name: {'$regex': cName, '$options' : 'i'}}).toArray(function(err, items) {
             if (err) throw err;
 
             if (items.length == 0)
@@ -101,7 +86,7 @@ function characterBotAdd(message) {
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('nopixel_characters');
 
-        col.find({ name: cName}).toArray(function(err, items) {
+        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
             if (err) throw err;
 
             if (items.length == 0)
@@ -131,7 +116,7 @@ function characterBotUpdate(message) {
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('nopixel_characters');
 
-        col.find({ name: {'$regex': cName}}).toArray(function(err, items) {
+        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
             if (err) throw err;
 
             if (items.length == 1)

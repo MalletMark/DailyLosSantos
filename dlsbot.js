@@ -4,6 +4,10 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const { Client, RichEmbed } = require('discord.js');
 
+const MongoClient = require('mongodb').MongoClient;
+const mongoUrl = process.env.MONGODB_CONN;
+const mongoDbName = 'dls';
+
 var weedDate = Date.now();
 const weedWords = ['weed', 'smoke', 'bowl', 'kush', 'bong', 'drug', 'pot', 'dank', 'thc', 'blunt', 'joint', '420'];
 
@@ -17,6 +21,21 @@ client.login(process.env.API_CLIENT_TOKEN);
 client.on('message', message => {
     if (message.content === '!testbot'){
         message.channel.send('works');
+    }
+
+    if (message.content.substring(0, 11) === '!character ')
+    {
+        characterBot(message);
+    }
+
+    if (message.content.substring(0, 16) === '!characterUpdate')
+    {
+        characterBotUpdate(message);
+    }
+
+    if (message.content.substring(0, 13) === '!characterAdd')
+    {
+        characterBotAdd(message);
     }
 
     if (message.content.substring(0,6) === '!recap')
@@ -36,6 +55,110 @@ client.on('message', message => {
         quoteBot(message, process.env.QUOTE_CHANNEL_ID);
     }
 });
+
+function characterBot(message) {
+    const cName = message.content.substring(11);
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_characters');
+
+        col.find({ name: {'$regex': cName}}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 0)
+            {
+                message.channel.send(`No Characters Found :(. To add a new character, type !characterAdd <${cName}>`);
+            }
+            else if(items.length > 1)
+            {
+                var characters = items.map(x => x['name']);
+                message.channel.send(`Found ${items.length} characters! ${characters.join(', ')}`);
+            }
+            else
+            {
+                const foundCharacter = items[0];
+                if (foundCharacter.description == null)
+                    message.channel.send(`No info on ${foundCharacter.name}. Add a description by typing '!characterUpdate <${foundCharacter.name}> add your description here!'`);
+                else
+                {
+                    const embed = new RichEmbed()
+                    .setTitle(foundCharacter.name)
+                    .setColor(0xFF0000)
+                    .setDescription(foundCharacter.description);
+                    message.channel.send(embed);   
+                }
+            }
+        });
+
+        client.close();
+    });
+}
+
+function characterBotAdd(message) {
+    const cName = message.content.split('<')[1].split('>')[0];
+    const cDesc = message.content.split('>')[1].trim();
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_characters');
+
+        col.find({ name: cName}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 0)
+            {
+                col.insertOne({ name: cName }, function(err, item) {
+                    if (err) throw err;
+
+                    message.channel.send(`${cName} has now been filed!`);
+                    client.close();
+                })
+            }
+            else
+            {
+                message.channel.send("That character already exists!");
+
+                client.close();
+            }
+        });
+
+    });
+}
+
+function characterBotUpdate(message) {
+    const cName = message.content.split('<')[1].split('>')[0];
+    const cDesc = message.content.split('>')[1].trim();
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_characters');
+
+        col.find({ name: {'$regex': cName}}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 1)
+            {
+                col.updateOne({ _id: items[0]._id }, { $set: { description: cDesc }}, function(err, item) {
+                    if (err) throw err;
+
+                    message.channel.send(`Thanks for updating ${items[0].name}'s file!`);
+                    client.close();
+                })
+            }
+            else 
+            {
+                if(items.length > 1)
+                {
+                    var characters = items.map(x => x['name']);
+                    message.channel.send(`Found ${items.length} characters! Please select a single character`);
+                }
+                else
+                {
+                    message.channel.send("No Characters Found");
+                }
+                client.close();
+            }
+        });
+    });
+}
 
 function recapBot(message) {
     const recapNum = 10;

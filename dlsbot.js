@@ -1,4 +1,5 @@
 require('dotenv').config();
+const fs = require('fs');
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -36,6 +37,40 @@ client.on('message', message => {
         quoteBot(message, process.env.QUOTE_CHANNEL_ID);
     }
 });
+
+async function getCharacters(message)
+{
+    let last_id;
+    const channel = message.channel;
+
+    var c_log = fs.createWriteStream('c_log.txt', { flags: 'a' });
+
+    while (true)
+    {
+        const options = { limit : 100 };
+        if (last_id) {
+            options.before = last_id;
+        }
+
+        const mQueue = await channel.fetchMessages(options);
+        mQueue.array().every(function(m)
+        {
+            if (m.content.substring(0, 10) == '!character')
+            {
+                c_log.write(m.content + '\r\n');
+            }
+            return true;
+        });
+
+        last_id = mQueue.last().id;
+
+        if (mQueue.size != 100) {
+            break;
+        }
+    }
+
+    c_log.end();
+}
 
 function characterBot(message) {
     const cName = message.content.substring(11);
@@ -154,7 +189,7 @@ function recapBot(message) {
         {
             messagesQueue.reverse();
             const rc = (messagesQueue.length > 1) ? messagesQueue.length.toString() + ' recaps' : 'recap'
-            const messagesFormatted = messagesQueue.map(m => `[${m.content.substring(0, 20)}...](${m.url})`);
+            const messagesFormatted = messagesQueue.map(m => `[${m.content.substring(0, 20)}... by ${m.author.username}](${m.url})`);
 
             const embed = new RichEmbed()
             .setTitle(`Here are the last ${rc} I could find!`)

@@ -8,8 +8,6 @@ const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 
-var weedDate = Date.now();
-const weedWords = ['weed', 'smoke', 'bowl', 'kush', 'bong', 'drug', 'pot', 'dank', 'thc', 'blunt', 'joint', '420'];
 const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6']
 
 client.once('ready', () => {
@@ -24,11 +22,11 @@ client.on('message', message => {
 
     if (message.content === '!testbot') {
         message.channel.send('works');
-    } else if (message.content.substring(0, 11) === 'tcharacter ') {
+    } else if (message.content.substring(0, 11) === '!character ') {
         characterBot(message);
-    } else if (message.content.substring(0, 16) === 'tcharacterUpdate') {
+    } else if (message.content.substring(0, 16) === '!characterUpdate') {
         characterBotUpdate(message);
-    } else if (message.content.substring(0, 13) === 'tcharacterAdd') {
+    } else if (message.content.substring(0, 13) === '!characterAdd') {
         characterBotAdd(message);
     } else if (message.content.substring(0,6) === '!recap') {
         recapBot(message);
@@ -36,11 +34,6 @@ client.on('message', message => {
         message.content.indexOf('<') > 0 && 
         message.content.indexOf('>') > 0) {
         quoteBot(message, process.env.QUOTE_CHANNEL_ID);
-    }
-
-    if (message.author.username == "Pixstrad" && weedWords.some(word => message.content.includes(word)))
-    {
-        pixBot(message);
     }
 });
 

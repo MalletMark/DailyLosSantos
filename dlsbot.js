@@ -10,6 +10,7 @@ const mongoDbName = 'dls';
 
 var weedDate = Date.now();
 const weedWords = ['weed', 'smoke', 'bowl', 'kush', 'bong', 'drug', 'pot', 'dank', 'thc', 'blunt', 'joint', '420'];
+const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6']
 
 client.once('ready', () => {
     console.log('Ready!');
@@ -19,13 +20,15 @@ client.once('ready', () => {
 client.login(process.env.API_CLIENT_TOKEN);
 
 client.on('message', message => {
+    const hasPerm = permRoles.some(role => message.member.roles.map(r => r.name).indexOf(role) > -1);
+
     if (message.content === '!testbot') {
         message.channel.send('works');
-    } else if (message.content.substring(0, 11) === '!character ') {
+    } else if (message.content.substring(0, 11) === 'tcharacter ') {
         characterBot(message);
-    } else if (message.content.substring(0, 16) === '!characterUpdate') {
+    } else if (message.content.substring(0, 16) === 'tcharacterUpdate') {
         characterBotUpdate(message);
-    } else if (message.content.substring(0, 13) === '!characterAdd') {
+    } else if (message.content.substring(0, 13) === 'tcharacterAdd') {
         characterBotAdd(message);
     } else if (message.content.substring(0,6) === '!recap') {
         recapBot(message);
@@ -91,7 +94,11 @@ function characterBotAdd(message) {
 
             if (items.length == 0)
             {
-                col.insertOne({ name: cName }, function(err, item) {
+                const cObj = {};
+                cObj["name"] = cName;
+                if (cDesc.length > 0) cObj["description"] = cDesc
+
+                col.insertOne(cObj, function(err, item) {
                     if (err) throw err;
 
                     message.channel.send(`${cName} has now been filed!`);

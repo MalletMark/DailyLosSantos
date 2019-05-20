@@ -35,7 +35,18 @@ client.on('message', message => {
         message.content.indexOf('<') > 0 && 
         message.content.indexOf('>') > 0) {
         quoteBot(message, process.env.QUOTE_CHANNEL_ID);
+    } else if (message.content.substring(0, 8) === '!hitlist') {
+        if (message.content.indexOf('-') > 0)
+            hitListBotKill(message);
+        else
+            hitListBot(message);
+    } else if (message.content.substring(0, 12) === '!hitlistKill') {
+        hitListBotKill(message);
     }
+});
+
+client.on('messageReactionAdd', (reaction, user) => {
+	console.log(`${user.username} reacted with "${reaction.emoji.name}".`);
 });
 
 async function getCharacters(message)
@@ -282,4 +293,48 @@ function quoteBot(message, channelId) {
     .setDescription(body);
 
     qChannel.send(embed);
+}
+
+function hitListBot(message) {
+    const cName = message.content.substring(9);
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_hitlist');
+
+        col.findOne({ listname: {'$regex': cName, '$options' : 'i'}}, function (err, result){
+            if (result == null)
+                message.channel.send(`${cName}'s list not found.`);
+            else {
+                var targets = result.targets.map(x => (x.status) ? `~~${x.name}~~` : x.name);
+                const embed = new RichEmbed()
+                .setTitle(`${result.listname}'s List`)
+                .setColor(0xFF0000)
+                .setDescription(targets.join('\n'));
+                message.channel.send(embed);   
+            }
+    
+            client.close();
+        })
+    });
+}
+
+function hitListBotKill(message)
+{
+    const cName = message.content.substring(12).split('-')[0].trim();
+    const tName = message.content.split('-')[1].trim();
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_hitlist');
+
+        col.updateOne(
+            { listname: {'$regex': cName, '$options' : 'i'}, 'targets.name' : {'$regex': tName, '$options' : 'i'}}, 
+            { $set: { 'targets.$.status': true }}, function (err, result) {
+            if (result.matchedCount == 0)
+                message.channel.send(`${tName} was not a target`);
+            else
+                message.channel.send(`Good bye ${tName}`);
+    
+            client.close();
+        })
+    });
 }

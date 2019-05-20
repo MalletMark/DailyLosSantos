@@ -38,8 +38,10 @@ client.on('message', message => {
     } else if (message.content.substring(0, 8) === '!hitlist') {
         if (message.content.indexOf('-') > 0)
             hitListBotKill(message);
+        else if (message.content.indexOf('+') > 0)
+            hitListBotAdd(message);
         else
-            hitListBot(message);
+            hitListBot(message)
     } else if (message.content.substring(0, 12) === '!hitlistKill') {
         hitListBotKill(message);
     }
@@ -320,7 +322,7 @@ function hitListBot(message) {
 
 function hitListBotKill(message)
 {
-    const cName = message.content.substring(12).split('-')[0].trim();
+    const cName = message.content.substring(8).split('-')[0].trim();
     const tName = message.content.split('-')[1].trim();
 
     MongoClient.connect(mongoUrl, function(err, client) {
@@ -333,6 +335,24 @@ function hitListBotKill(message)
                 message.channel.send(`${tName} was not a target`);
             else
                 message.channel.send(`Good bye ${tName}`);
+    
+            client.close();
+        })
+    });
+}
+
+function hitListBotAdd(message)
+{
+    const cName = message.content.substring(8).split('+')[0].trim();
+    const tName = message.content.split('+')[1].trim();
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_hitlist');
+
+        col.updateOne(
+            { listname: {'$regex': cName, '$options' : 'i'}}, 
+            { $push: { targets: { name: tName, status: true }}}, function (err, result) {
+                message.channel.send(`${cName} will see you soon ${tName}`);
     
             client.close();
         })

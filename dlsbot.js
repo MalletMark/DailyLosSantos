@@ -351,7 +351,7 @@ function hitListBotAdd(message)
 
         col.updateOne(
             { listname: {'$regex': cName, '$options' : 'i'}}, 
-            { $push: { targets: { name: tName, status: true }}}, function (err, result) {
+            { $push: { targets: { name: tName, status: false }}}, function (err, result) {
                 message.channel.send(`${cName} will see you soon ${tName}`);
     
             client.close();

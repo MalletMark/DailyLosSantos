@@ -45,13 +45,13 @@ client.on('message', message => {
     } else if (message.content.substring(0, 12) === '!hitlistKill') {
         hitListBotKill(message);
     } else if (message.content.substring(0, 5) === '!ship') {
-        // if (message.content.indexOf('<') > 0 &&
-        //     message.content.indexOf('>') > 0 &&
-        //     message.content.indexOf('(') > 0 &&
-        //     message.content.indexOf(')') > 0)
-        //     shipBotAdd(message);
-        // else
-        //     shipBot(message);
+        if (message.content.indexOf('<') > 0 &&
+            message.content.indexOf('>') > 0 &&
+            message.content.indexOf('(') > 0 &&
+            message.content.indexOf(')') > 0)
+            shipBotAdd(message);
+        else
+            shipBot(message);
     }
 });
 
@@ -414,7 +414,7 @@ function shipBotAdd(message) {
 }
 
 function shipBotJoin(reaction) {
-    const sUser = reaction.users.map(x=>x.username);
+    const sUsers = reaction.users.map(x=>x.username);
     const sName = reaction.message.content.split('~')[1]
 
     MongoClient.connect(mongoUrl, function(err, client) {
@@ -423,8 +423,8 @@ function shipBotJoin(reaction) {
         col.findOne({ name: sName }, function(err, result) {
             var sCaptains = result.captains;
 
-            col.update({ captains: { $in: sCaptains } }, { $pull: { members: sUser } }, { multi: true }, function(err, result) {
-                col.updateOne({ name: sName }, { $push: { members: sUser }});
+            col.update({ captains: { $in: sCaptains } }, { $pull: { members: { $in: sUsers } } }, { multi: true }, function(err, result) {
+                col.updateOne({ name: sName }, { $push: { members: { $each: sUsers } } });
                 client.close();
             });
         })

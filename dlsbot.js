@@ -45,20 +45,21 @@ client.on('message', message => {
     } else if (message.content.substring(0, 12) === '!hitlistKill') {
         hitListBotKill(message);
     } else if (message.content.substring(0, 5) === '!ship') {
-        if (message.content.indexOf('<') > 0 &&
-            message.content.indexOf('>') > 0 &&
-            message.content.indexOf('(') > 0 &&
-            message.content.indexOf(')') > 0)
-            shipBotAdd(message);
-        else
-            shipBot(message);
+        // if (message.content.indexOf('<') > 0 &&
+        //     message.content.indexOf('>') > 0 &&
+        //     message.content.indexOf('(') > 0 &&
+        //     message.content.indexOf(')') > 0)
+        //     shipBotAdd(message);
+        // else
+        //     shipBot(message);
+        message.channel.send('ShipBot is down for maintanence!')
     }
 });
 
 client.on('messageReactionAdd', (reaction, user) => {
-    if (reaction.message.author.username === 'LosSantosFiles' &&
-        reaction.message.content.split('').reverse().join('').substring(0, 6) === '!su pi')
-	    shipBotJoin(reaction);
+    // if (reaction.message.author.username === 'LosSantosFiles' &&
+    //     reaction.message.content.split('').reverse().join('').substring(0, 6) === '!su pi')
+	//     shipBotJoin(reaction);
 });
 
 async function getCharacters(message)

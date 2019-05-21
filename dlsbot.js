@@ -58,7 +58,7 @@ client.on('message', message => {
 client.on('messageReactionAdd', (reaction, user) => {
     if (reaction.message.author.username === 'LosSantosFiles' &&
         reaction.message.content.split('').reverse().join('').substring(0, 6) === '!su pi')
-	    shipBotJoin(reaction);
+	    //shipBotJoin(reaction);
 });
 
 async function getCharacters(message)
@@ -414,7 +414,7 @@ function shipBotAdd(message) {
 }
 
 function shipBotJoin(reaction) {
-    const sUser = reaction.users.first().username;
+    const sUser = reaction.users.map(x=>x.username);
     const sName = reaction.message.content.split('~')[1]
 
     MongoClient.connect(mongoUrl, function(err, client) {

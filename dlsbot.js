@@ -56,8 +56,8 @@ client.on('message', message => {
 });
 
 client.on('messageReactionAdd', (reaction, user) => {
-    if (reaction.message.author.username === 'LosSantosFiles' &&
-        reaction.message.content.split('').reverse().join('').substring(0, 6) === '!su pi')
+    // if (reaction.message.author.username === 'LosSantosFiles' &&
+    //     reaction.message.content.split('').reverse().join('').substring(0, 6) === '!su pi')
 	    //shipBotJoin(reaction);
 });
 

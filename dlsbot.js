@@ -44,11 +44,21 @@ client.on('message', message => {
             hitListBot(message)
     } else if (message.content.substring(0, 12) === '!hitlistKill') {
         hitListBotKill(message);
+    } else if (message.content.substring(0, 5) === '!ship') {
+        if (message.content.indexOf('<') > 0 &&
+            message.content.indexOf('>') > 0 &&
+            message.content.indexOf('(') > 0 &&
+            message.content.indexOf(')') > 0)
+            shipBotAdd(message);
+        else
+            shipBot(message);
     }
 });
 
 client.on('messageReactionAdd', (reaction, user) => {
-	console.log(`${user.username} reacted with "${reaction.emoji.name}".`);
+    if (reaction.message.author.username === 'LosSantosFiles' &&
+        reaction.message.content.split('').reverse().join('').substring(0, 6) === '!su pi')
+	    shipBotJoin(reaction);
 });
 
 async function getCharacters(message)
@@ -355,6 +365,68 @@ function hitListBotAdd(message)
                 message.channel.send(`${cName} will see you soon ${tName}`);
     
             client.close();
+        })
+    });
+}
+
+function shipBot(message) {
+    const sMembers = message.content.substring(6).trim().split('+');
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_shiplist');
+        var regex = [];
+        
+        sMembers.forEach(function(sMember){
+            regex.push(new RegExp(sMember, "i"));
+        });
+
+        col.find({ captains: {'$all': regex}}, function (err, results){
+            if (results == null)
+                message.channel.send(`${cName}'s list not found.`);
+            else {
+                results.forEach(function(ship){
+                    message.channel.send(`:ship:~${ship.name}~:ship: has ${ship.members.length} members! React to me if you ship us!`)
+                });
+            }
+    
+            client.close();
+        })
+    });
+}
+
+function shipBotAdd(message) {
+    const sName = message.content.split('<')[1].split('>')[0];
+    const sCaptains = message.content.split('(')[1].split(')')[0].split(',').map(c => c.trim());
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_shiplist');
+        var shipObj = {
+            "name" : sName,
+            "captains" : sCaptains,
+            "members" : []
+        }
+
+        col.insertOne(shipObj, function (err, result){
+            message.channel.send(`:ship:~${sName}~:ship: has sailed!`)    
+            client.close();
+        })
+    });
+}
+
+function shipBotJoin(reaction) {
+    const sUser = reaction.users.first().username;
+    const sName = reaction.message.content.split('~')[1]
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_shiplist');
+
+        col.findOne({ name: sName }, function(err, result) {
+            var sCaptains = result.captains;
+
+            col.update({ captains: { $in: sCaptains } }, { $pull: { members: sUser } }, { multi: true }, function(err, result) {
+                col.updateOne({ name: sName }, { $push: { members: sUser }});
+                client.close();
+            });
         })
     });
 }

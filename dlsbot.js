@@ -9,7 +9,8 @@ const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 
-const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6']
+const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6'];
+const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯'];
 
 client.once('ready', () => {
     console.log('Ready!');
@@ -44,22 +45,15 @@ client.on('message', message => {
             hitListBot(message)
     } else if (message.content.substring(0, 12) === '!hitlistKill') {
         hitListBotKill(message);
-    } else if (message.content.substring(0, 5) === '!ship') {
-        // if (message.content.indexOf('<') > 0 &&
-        //     message.content.indexOf('>') > 0 &&
-        //     message.content.indexOf('(') > 0 &&
-        //     message.content.indexOf(')') > 0)
-        //     shipBotAdd(message);
-        // else
-        //     shipBot(message);
-        message.channel.send('ShipBot is down for maintanence!')
+    } else if (message.content.substring(0, 5) === '!shid') {
+        if (message.content.indexOf('<') > 0 &&
+            message.content.indexOf('>') > 0 &&
+            message.content.indexOf('(') > 0 &&
+            message.content.indexOf(')') > 0)
+            shipBotAdd(message);
+        else
+            shipBot(message);
     }
-});
-
-client.on('messageReactionAdd', (reaction, user) => {
-    // if (reaction.message.author.username === 'LosSantosFiles' &&
-    //     reaction.message.content.split('').reverse().join('').substring(0, 6) === '!su pi')
-	//     shipBotJoin(reaction);
 });
 
 async function getCharacters(message)
@@ -382,15 +376,39 @@ function shipBot(message) {
         });
 
         col.find({ captains: {'$all': regex}}, function (err, results){
-            if (results == null)
-                message.channel.send(`${cName}'s list not found.`);
+            if (results.count() > 0)
+                message.channel.send(`No ships found :(`);
             else {
+                var cNum = 0;
+                var sUsers;
+                var sId = 0;
+                var sNames = []; 
+                var embed = new RichEmbed()
+                .setTitle(`${sMembers[0]}'s Romances`)
+                .setColor(0xFF25C0)
+                .setDescription('Vote for your favorite ship by reacting with the designated emojis! You can only vote for 1 couple!')
+                .setFooter('This poll ends in 10 minutes!');
+
                 results.forEach(function(ship){
-                    message.channel.send(`:ship:~${ship.name}~:ship: has ${ship.members.length} members! React to me if you ship us!`)
+                    sNames.push(ship.name);
+                    embed.addField(ship.name, `${voteOptions[cNum++]} (${ship.members.length}) members`, true);
+                }, function() { 
+                    message.channel.send(embed).then((sMessage) => {
+                        const filter = (reaction, user) => ({});
+                        sMessage.awaitReactions(filter, { time: 600000 })
+                        .then((collected) => {
+                            collected.array().forEach(function(react) {
+                                sUsers = react.users.map(x=>x.username);
+                                sId = voteOptions.indexOf(react.emoji.name);
+                                if (sId > -1) {
+                                    shipBotJoin(col, sNames[sId], sUsers);
+                                }
+                            });
+                        }, function() { client.close(); })
+                        .catch(console.error);
+                    });
                 });
             }
-    
-            client.close();
         })
     });
 }
@@ -414,19 +432,14 @@ function shipBotAdd(message) {
     });
 }
 
-function shipBotJoin(reaction) {
-    const sUsers = reaction.users.map(x=>x.username);
-    const sName = reaction.message.content.split('~')[1]
-
+function shipBotJoin(col, sName, sUsers) {
     MongoClient.connect(mongoUrl, function(err, client) {
-        const col = client.db(mongoDbName).collection('nopixel_shiplist');
 
         col.findOne({ name: sName }, function(err, result) {
             var sCaptains = result.captains;
 
             col.update({ captains: { $in: sCaptains } }, { $pull: { members: { $in: sUsers } } }, { multi: true }, function(err, result) {
                 col.updateOne({ name: sName }, { $push: { members: { $each: sUsers } } });
-                client.close();
             });
         })
     });

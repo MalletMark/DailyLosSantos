@@ -387,7 +387,7 @@ function shipBot(message) {
                 .setTitle(`${sMembers[0]}'s Romances`)
                 .setColor(0xFF25C0)
                 .setDescription('Vote for your favorite ship by reacting with the designated emojis! You can only vote for 1 couple!')
-                .setFooter('This poll ends in 10 minutes!');
+                .setFooter('This poll ends in 2 minutes!');
 
                 results.forEach(function(ship){
                     sNames.push(ship.name);

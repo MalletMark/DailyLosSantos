@@ -45,7 +45,7 @@ client.on('message', message => {
             hitListBot(message)
     } else if (message.content.substring(0, 12) === '!hitlistKill') {
         hitListBotKill(message);
-    } else if (message.content.substring(0, 5) === '!ship') {
+    } else if (message.content.substring(0, 5) === '!shid') {
         if (message.content.indexOf('<') > 0 &&
             message.content.indexOf('>') > 0 &&
             message.content.indexOf('(') > 0 &&
@@ -376,7 +376,7 @@ function shipBot(message) {
         });
 
         col.find({ captains: {'$all': regex}}, function (err, results){
-            if (results.count() > 0)
+            if (!results.length)
                 message.channel.send(`No ships found :(`);
             else {
                 var cNum = 0;
@@ -395,6 +395,11 @@ function shipBot(message) {
                 }, function() { 
                     message.channel.send(embed).then((sMessage) => {
                         const filter = (reaction, user) => ({});
+                        for (var i = 0; i < sNames.length; i++)
+                        {
+                            sMessage.react(`${voteOptions[i]}`);
+                        }
+                        
                         sMessage.awaitReactions(filter, { time: 120000 })
                         .then((collected) => {
                             collected.array().forEach(function(react) {

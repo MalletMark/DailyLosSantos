@@ -45,7 +45,7 @@ client.on('message', message => {
             hitListBot(message)
     } else if (message.content.substring(0, 12) === '!hitlistKill') {
         hitListBotKill(message);
-    } else if (message.content.substring(0, 5) === '!shid') {
+    } else if (message.content.substring(0, 5) === '!ship') {
         if (message.content.indexOf('<') > 0 &&
             message.content.indexOf('>') > 0 &&
             message.content.indexOf('(') > 0 &&
@@ -395,16 +395,34 @@ function shipBot(message) {
                 }, function() { 
                     message.channel.send(embed).then((sMessage) => {
                         const filter = (reaction, user) => ({});
-                        sMessage.awaitReactions(filter, { time: 600000 })
+                        sMessage.awaitReactions(filter, { time: 120000 })
                         .then((collected) => {
                             collected.array().forEach(function(react) {
                                 sUsers = react.users.map(x=>x.username);
                                 sId = voteOptions.indexOf(react.emoji.name);
+
                                 if (sId > -1) {
                                     shipBotJoin(col, sNames[sId], sUsers);
                                 }
                             });
-                        }, function() { client.close(); })
+
+                            setTimeout(function(){
+                                col.aggregate([
+                                    { $match : { "captains": {'$all': regex}}},
+                                    { $unwind : "$members" },
+                                    { $group : { 
+                                        "_id": "$name",
+                                        "len" : { $sum : 1 }}},
+                                    { $sort : {len : -1 } },
+                                    { $limit : 1 }])
+                                    .toArray(function(err, result) {
+                                        if (err) throw err;
+
+                                        message.channel.send(`Poll is closed! ${result[0]._id} wins!`);
+                                        client.close(); 
+                                    });
+                            }, 1000);
+                        })
                         .catch(console.error);
                     });
                 });
@@ -432,13 +450,13 @@ function shipBotAdd(message) {
     });
 }
 
-function shipBotJoin(col, sName, sUsers) {
+async function shipBotJoin(col, sName, sUsers) {
     MongoClient.connect(mongoUrl, function(err, client) {
 
         col.findOne({ name: sName }, function(err, result) {
             var sCaptains = result.captains;
 
-            col.update({ captains: { $in: sCaptains } }, { $pull: { members: { $in: sUsers } } }, { multi: true }, function(err, result) {
+            col.updateMany({ captains: { $in: sCaptains } }, { $pull: { members: { $in: sUsers } } }, { multi: true }, function(err, result) {
                 col.updateOne({ name: sName }, { $push: { members: { $each: sUsers } } });
             });
         })

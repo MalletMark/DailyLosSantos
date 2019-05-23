@@ -522,7 +522,7 @@ function crashBot(message) {
                 if (cNum > 0) {
                     message.channel.send(`${foundCharacter.name} has crashed ${cNum++} times!`);
 
-                    col.updateOne({ _id: foundCharacter._id }, { $inc: { crashCount: cNum }}, function(err, item) {
+                    col.updateOne({ _id: foundCharacter._id }, { $set: { crashCount: cNum }}, function(err, item) {
                         client.close();
                     })
                 }

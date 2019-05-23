@@ -51,6 +51,8 @@ client.on('message', message => {
             shipBotAdd(message);
         else
             shipBot(message);
+    } else if (message.content.substring(0, 6) === '!crash' && process.env.CRASHBOT == 'TRUE') {
+        crashBot(message);
     }
 });
 
@@ -485,5 +487,60 @@ async function shipBotJoin(col, sName, sUsers) {
                 col.updateOne({ name: sName }, { $push: { members: { $each: sUsers } } });
             });
         })
+    });
+}
+
+function crashBot(message) {
+    var cName = '';
+    var cNum = 0;
+
+    if (message.content.indexOf('(') > 0 && message.content.indexOf(')') > 0) {
+        cName = message.content.substring(6).split('(')[0].trim();
+        cNum = Number(message.content.split('(')[1].split(')')[0]);
+    } else {
+        cName = message.content.substring(6).trim();
+    }
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_characters');
+
+        col.find({ name: {'$regex': cName, '$options' : 'i'}}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 0)
+            {
+                message.channel.send(`${cName} has no record!`);
+            }
+            else if(items.length > 1)
+            {
+                var characters = items.map(x => x['name']);
+                message.channel.send(`Which ${cName}? ${characters.join(', ')}`);
+            }
+            else
+            {
+                const foundCharacter = items[0];
+                if (cNum > 0) {
+                    message.channel.send(`${foundCharacter.name} has crashed ${cNum++} times!`);
+
+                    col.updateOne({ _id: foundCharacter._id }, { $inc: { crashCount: cNum }}, function(err, item) {
+                        client.close();
+                    })
+                }
+                else if (foundCharacter.crashCount == null) {
+                    message.channel.send(`${foundCharacter.name} has had his first inicident!`);
+
+                    col.updateOne({ _id: foundCharacter._id }, { $set: { crashCount: 1 }}, function(err, item) {
+                        client.close();
+                    })
+                }
+                else {
+                    message.channel.send(`${foundCharacter.name} has crashed ${foundCharacter.crashCount + 1} times!`);
+
+                    col.updateOne({ _id: foundCharacter._id }, { $inc: { crashCount: 1 }}, function(err, item) {
+                        client.close();
+                    })
+                }
+            }
+        });
     });
 }

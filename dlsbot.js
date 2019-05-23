@@ -24,28 +24,26 @@ client.on('message', message => {
 
     if (message.content === '!testbot') {
         message.channel.send('works');
-    } else if (message.content.substring(0, 11) === '!character ') {
+    } else if (message.content.substring(0, 11) === '!character ' && process.env.CHARACTERBOT == 'TRUE') {
         characterBot(message);
-    } else if (message.content.substring(0, 16) === '!characterUpdate') {
+    } else if (message.content.substring(0, 16) === '!characterUpdate' && process.env.CHARACTERBOTUPDATE == 'TRUE') {
         characterBotUpdate(message);
-    } else if (message.content.substring(0, 13) === '!characterAdd') {
+    } else if (message.content.substring(0, 13) === '!characterAdd' && process.env.CHARACTERBOTADD == 'TRUE') {
         characterBotAdd(message);
-    } else if (message.content.substring(0,6) === '!recap') {
+    } else if (message.content.substring(0,6) === '!recap' && process.env.RECAPBOT == 'TRUE') {
         recapBot(message);
     } else if (message.content.substring(0, 6) === '!quote' &&
         message.content.indexOf('<') > 0 && 
-        message.content.indexOf('>') > 0) {
+        message.content.indexOf('>') > 0 && process.env.QUOTEBOT == 'TRUE') {
         quoteBot(message, process.env.QUOTE_CHANNEL_ID);
-    } else if (message.content.substring(0, 8) === '!hitlist') {
+    } else if (message.content.substring(0, 8) === '!hitlist' && process.env.HITLISTBOT == 'TRUE') {
         if (message.content.indexOf('-') > 0)
             hitListBotKill(message);
         else if (message.content.indexOf('+') > 0)
             hitListBotAdd(message);
         else
             hitListBot(message)
-    } else if (message.content.substring(0, 12) === '!hitlistKill') {
-        hitListBotKill(message);
-    } else if (message.content.substring(0, 5) === '!shid') {
+    } else if (message.content.substring(0, 5) === '!ship' && process.env.SHIPBOT == 'TRUE') {
         if (message.content.indexOf('<') > 0 &&
             message.content.indexOf('>') > 0 &&
             message.content.indexOf('(') > 0 &&
@@ -365,7 +363,8 @@ function hitListBotAdd(message)
 }
 
 function shipBot(message) {
-    const sMembers = message.content.substring(6).trim().split('+');
+    const sMembers = message.content.substring(6).trim().split('+').filter(function(x){ return x != ''});
+    if (sMembers.length == 0) return;
 
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('nopixel_shiplist');
@@ -376,7 +375,7 @@ function shipBot(message) {
         });
 
         col.find({ captains: {'$all': regex}}, function (err, results){
-            if (!results.length)
+            if (err)
                 message.channel.send(`No ships found :(`);
             else {
                 var cNum = 0;
@@ -387,23 +386,24 @@ function shipBot(message) {
                 .setTitle(`${sMembers[0]}'s Romances`)
                 .setColor(0xFF25C0)
                 .setDescription('Vote for your favorite ship by reacting with the designated emojis! You can only vote for 1 couple!')
-                .setFooter('This poll ends in 2 minutes!');
+                .setFooter('This poll ends in 3 minutes!');
 
                 results.forEach(function(ship){
                     sNames.push(ship.name);
                     embed.addField(ship.name, `${voteOptions[cNum++]} (${ship.members.length}) members`, true);
                 }, function() { 
+                    if (embed.fields.length == 0) {
+                        message.channel.send(`No ships found :(`);
+                        return;
+                    }
                     message.channel.send(embed).then((sMessage) => {
                         const filter = (reaction, user) => ({});
-                        for (var i = 0; i < sNames.length; i++)
-                        {
-                            sMessage.react(`${voteOptions[i]}`);
-                        }
+                        shipBotReact(sMessage, 0, sNames.length);
                         
-                        sMessage.awaitReactions(filter, { time: 120000 })
+                        sMessage.awaitReactions(filter, { time: 180000 })
                         .then((collected) => {
                             collected.array().forEach(function(react) {
-                                sUsers = react.users.map(x=>x.username);
+                                sUsers = react.users.map(x=>x.username).filter(u => u != 'LosSantosFiles');
                                 sId = voteOptions.indexOf(react.emoji.name);
 
                                 if (sId > -1) {
@@ -434,6 +434,12 @@ function shipBot(message) {
             }
         })
     });
+}
+
+async function shipBotReact(message, eCount, eMax) {
+    while (eCount++ < eMax) {
+        await message.react(`${voteOptions[eCount-1]}`);
+    }
 }
 
 function shipBotAdd(message) {

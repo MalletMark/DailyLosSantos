@@ -23,7 +23,7 @@ client.on('message', message => {
     const hasPerm = permRoles.some(role => message.member.roles.map(r => r.name).indexOf(role) > -1);
 
     if (message.content === '!testbot') {
-        message.channel.send('works');
+        message.channel.send(`works`);
     } else if (message.content.substring(0, 11) === '!character ' && process.env.CHARACTERBOT == 'TRUE') {
         characterBot(message);
     } else if (message.content.substring(0, 16) === '!characterUpdate' && process.env.CHARACTERBOTUPDATE == 'TRUE') {
@@ -89,6 +89,9 @@ async function getCharacters(message)
 }
 
 function characterBot(message) {
+    if (message.channel.name != 'public-records') {
+        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+    }
     const cName = message.content.substring(11);
 
     MongoClient.connect(mongoUrl, function(err, client) {
@@ -127,6 +130,10 @@ function characterBot(message) {
 }
 
 function characterBotAdd(message) {
+    if (message.channel.name != 'public-records') {
+        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+    }
+
     const cName = message.content.split('<')[1].split('>')[0];
     const cDesc = message.content.split('>')[1].trim();
 
@@ -161,6 +168,10 @@ function characterBotAdd(message) {
 }
 
 function characterBotUpdate(message) {
+    if (message.channel.name != 'public-records') {
+        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+    }
+    
     const cName = message.content.split('<')[1].split('>')[0];
     const cDesc = message.content.split('>')[1].trim();
 

@@ -91,6 +91,7 @@ async function getCharacters(message)
 function characterBot(message) {
     if (message.channel.name != 'public-records') {
         message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+        return;
     }
     const cName = message.content.substring(11);
 
@@ -132,6 +133,7 @@ function characterBot(message) {
 function characterBotAdd(message) {
     if (message.channel.name != 'public-records') {
         message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+        return;
     }
 
     const cName = message.content.split('<')[1].split('>')[0];
@@ -170,6 +172,7 @@ function characterBotAdd(message) {
 function characterBotUpdate(message) {
     if (message.channel.name != 'public-records') {
         message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+        return;
     }
     
     const cName = message.content.split('<')[1].split('>')[0];

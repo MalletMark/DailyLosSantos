@@ -54,7 +54,7 @@ client.on('message', message => {
             shipBot(message);
     } else if (message.content.substring(0, 6) === '!crash' && process.env.CRASHBOT == 'TRUE') {
         crashBot(message);
-    } else if (message.content.substring(0, 5) === '!jail') {
+    } else if (message.content.substring(0, 5) === '!jaid') {
         jailBot(message);
     }
 });
@@ -587,6 +587,7 @@ function jailBot(message) {
     if (!hasPerm) return;
 
     const mChannel = message.guild.channels.find(ch => ch.name === "moderation-log");
+    const jOfficer = message.author.username;
     const jName = message.content.substring(5).trim().split('-')[0].split(' ')[0];
     const jMonths = Number(message.content.substring(5).trim().split('-')[0].split(' ')[1]);
     const jReason = message.content.substring(5).trim().split('-')[1];
@@ -596,7 +597,7 @@ function jailBot(message) {
         member.removeRole(process.env.INTERVIEWERID);
         if (jReason != null) {
             console.log(jReason.trim());
-            mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months. Reason: ${jReason.trim()}`);
+            mChannel.send(`${jUser.username} has been sent to Bolingbrook by ${jOfficer} for ${jMonths} Months. Reason: ${jReason.trim()}`);
             member.sendMessage(`You have been timed out from posting for ${jMonths} minutes for the reason of: \n${jReason.trim()}`);
         } else {
             mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months`);

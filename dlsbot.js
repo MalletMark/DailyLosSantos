@@ -10,7 +10,7 @@ const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 
 const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6'];
-const permRoles2 = ['Editors', 'Editor-in-Chief'];
+const permRoles2 = process.env.JAILPERMS.split(',');
 const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯'];
 
 client.once('ready', () => {
@@ -593,7 +593,7 @@ function jailBot(message) {
     const jUser = client.users.find("username", jName);
     message.guild.fetchMember(jUser).then((member) => {
         member.addRole(process.env.BOLINGBROOKID);
-        member.removeRole(process.env.REPORTERID);
+        member.removeRole(process.env.INTERVIEWERID);
         if (jReason != null) {
             console.log(jReason.trim());
             mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months. Reason: ${jReason.trim()}`);
@@ -603,7 +603,7 @@ function jailBot(message) {
         }
 
         setTimeout(function(username) { 
-            member.addRole(process.env.REPORTERID);
+            member.addRole(process.env.INTERVIEWERID);
             member.removeRole(process.env.BOLINGBROOKID);
             mChannel.send(`${username} has been released`);
         }, 60000 * jMonths, jUser.username);

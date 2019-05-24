@@ -54,7 +54,7 @@ client.on('message', message => {
             shipBot(message);
     } else if (message.content.substring(0, 6) === '!crash' && process.env.CRASHBOT == 'TRUE') {
         crashBot(message);
-    } else if (message.content.substring(0, 5) === '!jaid') {
+    } else if (message.content.substring(0, 5) === '!jail') {
         jailBot(message);
     }
 });

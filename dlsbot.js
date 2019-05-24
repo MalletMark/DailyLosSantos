@@ -37,12 +37,14 @@ client.on('message', message => {
         message.content.indexOf('>') > 0 && process.env.QUOTEBOT == 'TRUE') {
         quoteBot(message, process.env.QUOTE_CHANNEL_ID);
     } else if (message.content.substring(0, 8) === '!hitlist' && process.env.HITLISTBOT == 'TRUE') {
-        if (message.content.indexOf('-') > 0)
+        if (message.content.indexOf('hitlistNew') >= 0)
+            hitListBotNew(message);
+        else if (message.content.indexOf('-') > 0)
             hitListBotKill(message);
         else if (message.content.indexOf('+') > 0)
             hitListBotAdd(message);
-        else
-            hitListBot(message)
+        else if (message.content.substring())
+            hitListBot(message);
     } else if (message.content.substring(0, 5) === '!ship' && process.env.SHIPBOT == 'TRUE') {
         if (message.content.indexOf('<') > 0 &&
             message.content.indexOf('>') > 0 &&
@@ -110,7 +112,7 @@ function characterBot(message) {
             else if(items.length > 1)
             {
                 var characters = items.map(x => x['name']);
-                message.channel.send(`Found ${items.length} characters! ${characters.join(', ')}`);
+                message.channel.send(`Found ${items.length} characters! Please try again with on of the following characters: \n ${characters.join(', ')}`);
             }
             else
             {
@@ -378,6 +380,40 @@ function hitListBotAdd(message)
     });
 }
 
+function hitListBotNew(message) {
+    const cName = message.content.substring(11).trim();
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_characters');
+
+        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 0) {
+                message.channel.send(`${cName} that character does not exist.`);
+            }
+            else if (items.length > 1) {
+                message.channel.send(`Please be more specific. I found the following: ${items.map(x=>x.name).join(', ')}`);
+            }
+            else {
+                const cFullName = items[0].name;
+                const cObj = {};
+                cObj["listname"] = cFullName;
+                cObj["targets"] = [];
+
+                col2 = client.db(mongoDbName).collection('nopixel_hitlist');
+                col2.insertOne(cObj, function(err, item) {
+                    if (err) throw err;
+
+                    message.channel.send(`${cFullName} has started a list...`);
+                    client.close();
+                })
+            }
+        });
+
+    });
+}
+
 function shipBot(message) {
     const sMembers = message.content.substring(6).trim().split('+').filter(function(x){ return x != ''});
     if (sMembers.length == 0) return;
@@ -520,7 +556,7 @@ function crashBot(message) {
             {
                 const foundCharacter = items[0];
                 if (cNum > 0) {
-                    message.channel.send(`${foundCharacter.name} has crashed ${cNum++} times!`);
+                    message.channel.send(`${foundCharacter.name} has crashed ${++cNum} times!`);
 
                     col.updateOne({ _id: foundCharacter._id }, { $set: { crashCount: cNum }}, function(err, item) {
                         client.close();

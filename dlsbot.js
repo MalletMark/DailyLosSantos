@@ -588,10 +588,10 @@ function jailBot(message) {
 
     const mChannel = message.guild.channels.find(ch => ch.name === "moderation-log");
     const jOfficer = message.author.username;
-    const jName = message.content.substring(5).trim().split('-')[0].split(' ')[0];
+    const jName = message.content.substring(5).split('<@')[1].split('>')[0];
     const jMonths = Number(message.content.substring(5).trim().split('-')[0].split(' ')[1]);
     const jReason = message.content.substring(5).trim().split('-')[1];
-    const jUser = client.users.find("username", jName);
+    const jUser = client.users.find("id", jName);
     message.guild.fetchMember(jUser).then((member) => {
         member.addRole(process.env.BOLINGBROOKID);
         member.removeRole(process.env.INTERVIEWERID);

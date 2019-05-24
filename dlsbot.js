@@ -599,6 +599,6 @@ function jailBot(message) {
             member.addRole(process.env.REPORTERID);
             member.removeRole(process.env.BOLINGBROOKID);
             mChannel.send(`${username} has been released`);
-        }, 10000 * jMonths, jUser.username);
+        }, 60000 * jMonths, jUser.username);
     })
 }

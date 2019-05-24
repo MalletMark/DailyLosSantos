@@ -591,13 +591,13 @@ function jailBot(message) {
     const jMonths = Number(message.content.substring(5).trim().split(' ')[1]);
     const jUser = client.users.find("username", jName);
     message.guild.fetchMember(jUser).then((member) => {
-        member.addRole('581300926560600088');
-        member.removeRole('579458786830450689');
+        member.addRole(process.env.BOLINGBROOKID);
+        member.removeRole(process.env.REPORTERID);
         mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months`);
 
         setTimeout(function(username) { 
-            member.addRole('579458786830450689');
-            member.removeRole('581300926560600088');
+            member.addRole(process.env.REPORTERID);
+            member.removeRole(process.env.BOLINGBROOKID);
             mChannel.send(`${username} has been released`);
         }, 10000 * jMonths, jUser.username);
     })

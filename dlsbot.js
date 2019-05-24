@@ -587,13 +587,20 @@ function jailBot(message) {
     if (!hasPerm) return;
 
     const mChannel = message.guild.channels.find(ch => ch.name === "moderation-log");
-    const jName = message.content.substring(5).trim().split(' ')[0];
-    const jMonths = Number(message.content.substring(5).trim().split(' ')[1]);
+    const jName = message.content.substring(5).trim().split('-')[0].split(' ')[0];
+    const jMonths = Number(message.content.substring(5).trim().split('-')[0].split(' ')[1]);
+    const jReason = message.content.substring(5).trim().split('-')[1];
     const jUser = client.users.find("username", jName);
     message.guild.fetchMember(jUser).then((member) => {
         member.addRole(process.env.BOLINGBROOKID);
         member.removeRole(process.env.REPORTERID);
-        mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months`);
+        if (jReason != null) {
+            console.log(jReason.trim());
+            mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months. Reason: ${jReason.trim()}`);
+            member.sendMessage(`You have been timed out from posting for ${jMonths} minutes for the reason of: \n${jReason.trim()}`);
+        } else {
+            mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months`);
+        }
 
         setTimeout(function(username) { 
             member.addRole(process.env.REPORTERID);

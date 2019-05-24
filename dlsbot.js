@@ -10,6 +10,7 @@ const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 
 const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6'];
+const permRoles2 = ['Editors', 'Editor-in-Chief'];
 const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯'];
 
 client.once('ready', () => {
@@ -20,8 +21,6 @@ client.once('ready', () => {
 client.login(process.env.API_CLIENT_TOKEN);
 
 client.on('message', message => {
-    const hasPerm = permRoles.some(role => message.member.roles.map(r => r.name).indexOf(role) > -1);
-
     if (message.content === '!testbot') {
         message.channel.send(`works`);
     } else if (message.content.substring(0, 11) === '!character ' && process.env.CHARACTERBOT == 'TRUE') {
@@ -55,6 +54,8 @@ client.on('message', message => {
             shipBot(message);
     } else if (message.content.substring(0, 6) === '!crash' && process.env.CRASHBOT == 'TRUE') {
         crashBot(message);
+    } else if (message.content.substring(0, 5) === '!jail') {
+        jailBot(message);
     }
 });
 
@@ -579,4 +580,25 @@ function crashBot(message) {
             }
         });
     });
+}
+
+function jailBot(message) {
+    const hasPerm = permRoles2.filter(role => -1 !== message.member.roles.map(r => r.name).indexOf(role)).length > 0;
+    if (!hasPerm) return;
+
+    const mChannel = message.guild.channels.find(ch => ch.name === "moderation-log");
+    const jName = message.content.substring(5).trim().split(' ')[0];
+    const jMonths = Number(message.content.substring(5).trim().split(' ')[1]);
+    const jUser = client.users.find("username", jName);
+    message.guild.fetchMember(jUser).then((member) => {
+        member.addRole('581300926560600088');
+        member.removeRole('579458786830450689');
+        mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months`);
+
+        setTimeout(function(username) { 
+            member.addRole('579458786830450689');
+            member.removeRole('581300926560600088');
+            mChannel.send(`${username} has been released`);
+        }, 10000 * jMonths, jUser.username);
+    })
 }

@@ -621,7 +621,8 @@ function staffBot(message) {
         message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
         return;
     }
-    const cName = message.content.substring(6);
+    
+    const cName = message.content.substring(6).trim();
 
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('dls_staff');

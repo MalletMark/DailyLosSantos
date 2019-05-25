@@ -57,7 +57,7 @@ client.on('message', message => {
     } else if (message.content.substring(0, 5) === '!jail') {
         jailBot(message);
     } else if (message.content.substring(0, 6) === '!staff' && process.env.STAFFBOT == 'TRUE') {
-        if (message.content.substr(0,7) === '!staffU')
+        if (message.content.substring(0,7) === '!staffU')
             staffBotUpdate(message);
         else
             staffBot(message);

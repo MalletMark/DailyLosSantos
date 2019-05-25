@@ -56,6 +56,11 @@ client.on('message', message => {
         crashBot(message);
     } else if (message.content.substring(0, 5) === '!jail') {
         jailBot(message);
+    } else if (message.content.substring(0, 6) === '!staff' && process.env.STAFFBOT == 'TRUE') {
+        if (message.content.substr(0,7) === '!staffU')
+            staffBotUpdate(message);
+        else
+            staffBot(message);
     }
 });
 
@@ -608,4 +613,87 @@ function jailBot(message) {
             mChannel.send(`${username} has been released`);
         }, 60000 * jMonths, jUser.username);
     })
+}
+
+function staffBot(message) {
+    if (message.channel.name != 'public-records') {
+        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+        return;
+    }
+    const cName = message.content.substring(11);
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('dls_staff');
+
+        col.find({ name: {'$regex': cName, '$options' : 'i'}}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 0)
+            {
+                message.channel.send(`${cName} is not a staff member.`);
+            }
+            else if(items.length > 1)
+            {
+                var characters = items.map(x => x['name']);
+                message.channel.send(`Found ${items.length} staff members! Please try again with on of the following characters: \n ${characters.join(', ')}`);
+            }
+            else
+            {
+                const foundCharacter = items[0];
+                if (foundCharacter.description == null)
+                    message.channel.send(`No info on ${foundCharacter.name}. Add a description by typing '!characterUpdate <${foundCharacter.name}> add your description here!'`);
+                else
+                {
+                    const embed = new RichEmbed()
+                    .setTitle(foundCharacter.name)
+                    .setColor(0xFF0000)
+                    .setDescription(foundCharacter.description);
+                    message.channel.send(embed);   
+                }
+            }
+        });
+
+        client.close();
+    });
+}
+
+function staffBotUpdate(message) {
+    if (message.channel.name != 'public-records') {
+        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+        return;
+    }
+    
+    const cName = message.content.split('<')[1].split('>')[0];
+    const cDesc = message.content.split('>')[1].trim();
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('dls_staff');
+
+        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 1)
+            {
+                col.updateOne({ _id: items[0]._id }, { $set: { description: cDesc }}, function(err, item) {
+                    if (err) throw err;
+
+                    message.channel.send(`Thanks for updating ${items[0].name}'s file!`);
+                    client.close();
+                })
+            }
+            else 
+            {
+                if(items.length > 1)
+                {
+                    var characters = items.map(x => x['name']);
+                    message.channel.send(`Found ${items.length} characters! Please select a single staff member`);
+                }
+                else
+                {
+                    message.channel.send("No staff member found");
+                }
+                client.close();
+            }
+        });
+    });
 }

@@ -10,7 +10,7 @@ const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 
 const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6'];
-const permRoles2 = ['Editors', 'Editor-in-Chief'];
+const permRoles2 = process.env.JAILPERMS.split(',');
 const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯'];
 
 client.once('ready', () => {
@@ -592,23 +592,24 @@ function jailBot(message) {
     if (!hasPerm) return;
 
     const mChannel = message.guild.channels.find(ch => ch.name === "moderation-log");
-    const jName = message.content.substring(5).trim().split('-')[0].split(' ')[0];
+    const jOfficer = message.author.username;
+    const jName = message.content.substring(5).split('<@')[1].split('>')[0];
     const jMonths = Number(message.content.substring(5).trim().split('-')[0].split(' ')[1]);
     const jReason = message.content.substring(5).trim().split('-')[1];
-    const jUser = client.users.find("username", jName);
+    const jUser = client.users.find("id", jName);
     message.guild.fetchMember(jUser).then((member) => {
         member.addRole(process.env.BOLINGBROOKID);
-        member.removeRole(process.env.REPORTERID);
+        member.removeRole(process.env.INTERVIEWERID);
         if (jReason != null) {
             console.log(jReason.trim());
-            mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months. Reason: ${jReason.trim()}`);
+            mChannel.send(`${jUser.username} has been sent to Bolingbrook by ${jOfficer} for ${jMonths} Months. Reason: ${jReason.trim()}`);
             member.sendMessage(`You have been timed out from posting for ${jMonths} minutes for the reason of: \n${jReason.trim()}`);
         } else {
             mChannel.send(`${jUser.username} has been sent to Bolingbrook for ${jMonths} Months`);
         }
 
         setTimeout(function(username) { 
-            member.addRole(process.env.REPORTERID);
+            member.addRole(process.env.INTERVIEWERID);
             member.removeRole(process.env.BOLINGBROOKID);
             mChannel.send(`${username} has been released`);
         }, 60000 * jMonths, jUser.username);

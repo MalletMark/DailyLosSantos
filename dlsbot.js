@@ -12,6 +12,7 @@ const mongoDbName = 'dls';
 const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6'];
 const permRoles2 = process.env.JAILPERMS.split(',');
 const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯'];
+var recorders = [];
 
 client.once('ready', () => {
     console.log('Ready!');
@@ -61,6 +62,10 @@ client.on('message', message => {
             staffBotUpdate(message);
         else
             staffBot(message);
+    } else if (message.content.substring(0, 7) === '!record' && process.env.RECORDBOT == 'TRUE') {
+        recordBot(message);
+    } else if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {
+        recordBot(message);
     }
 });
 
@@ -621,7 +626,7 @@ function staffBot(message) {
         message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
         return;
     }
-    
+
     const cName = message.content.substring(6).trim();
 
     MongoClient.connect(mongoUrl, function(err, client) {
@@ -697,5 +702,74 @@ function staffBotUpdate(message) {
                 client.close();
             }
         });
+    });
+}
+
+function recordBot(message) {
+    const rUserId = message.author.id;
+    
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('dls_staff');
+        const fileName = `${rUserId}.txt`;
+
+        if (message.content == '!recordStart') {
+            col.updateOne({ discordId: rUserId }, { $set: { recording: 0 }}, function(err, item) {
+                if (err) throw err;
+    
+                recorders.push(rUserId);
+                message.channel.send(`We are now recording all your message!`);
+                fs.writeFile(fileName, 'Start of Recording. \r\n', function(err) {
+                    if (err) throw err;
+                    console.log('Saved!');
+                });
+
+                client.close();
+            });
+        } 
+        else if (message.content == '!recordEnd') {        
+            col.updateOne({ discordId: rUserId }, { $set: { recording: 0 }}, function(err, item) {
+                if (err) throw err;
+    
+                recorders = recorders.filter(function(val, ind, arr){ return val == rUserId });
+                fs.readFile(fileName, function read(err, data) {
+                    if (err) throw err;
+                    
+                    var messages = data.toString().split("\r\n");
+                    var posts = [''];
+                    var pCount = 0;
+
+                    messages.forEach(function(m) {
+                        if (posts[pCount].length + m.length < 2000) {
+                            posts[pCount] += m + "\r\n";
+                        } else {
+                            posts[++pCount] = m;
+                        }
+                    })
+                    
+                    posts.forEach(function(p) {
+                        message.author.sendMessage(p);
+                    });
+                });
+
+                client.close();
+            });
+        }
+        else {
+            fs.appendFile(fileName, `${message.content} \r\n`, function(err) {
+                if (err) throw err;
+
+                col.updateOne({ discordId: rUserId }, { $inc: { recording: 1 }}, function(err, item) {
+                    if (err) throw err;
+    
+                    var messageCount = Number(item['recording']);
+    
+                    if (messageCount >= 50 && messageCount % 50 == 0) {
+                        message.channel.send(`You have recorded ${messageCount} messages!`);
+                    }
+    
+                    client.close();
+                });
+            });
+        }
     });
 }

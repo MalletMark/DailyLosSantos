@@ -66,6 +66,8 @@ client.on('message', message => {
         recordBot(message);
     } else if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {
         recordBot(message);
+    } else if (message.content.substring(0, 5) === '!roll') {
+        rollBot(message);
     }
 });
 
@@ -772,4 +774,17 @@ function recordBot(message) {
             });
         }
     });
+}
+
+function rollBot(message) {
+    const dNum = Number(message.content.split(' ')[1]);
+    const dType = Number(message.content.split(' ')[2]);
+
+    var diceStr = [];
+
+    for (var i = 0; i < dNum; i++) {
+        diceStr.push(Math.floor(Math.random() * dType) + 1);
+    }
+
+    message.channel.send(`You rolled a ${diceStr.join(', ')}`);
 }

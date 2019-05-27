@@ -662,9 +662,9 @@ function staffBot(message) {
                     .setColor(0xFF0000)
                     .addField('Role', foundCharacter.role)
                     .addField('Bio', foundCharacter.description)
-                    .addField('Favorite Channel', message.guild.channels.get(foundCharacter.channel).toString())
-                    .addField('Quote', foundCharacter.quote);
-                    message.channel.send(embed);   
+                    .addField('Favorite Channel', (foundCharacter.channel) ? message.guild.channels.get(foundCharacter.channel).toString() : "n/a")
+                    .addField('Quote', (foundCharacter.quote) ? foundCharacter.quote : "n/a");
+                    message.channel.send(embed);
                 }
             }
         });

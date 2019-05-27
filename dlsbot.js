@@ -662,7 +662,7 @@ function staffBot(message) {
                     .setColor(0xFF0000)
                     .addField('Role', foundCharacter.role)
                     .addField('Bio', foundCharacter.description)
-                    .addField('Favorite Channel', (foundCharacter.channel) ? message.guild.channels.get(foundCharacter.channel).toString() : "n/a")
+                    .addField('Favorite Channel', (foundCharacter.channel) ? foundCharacter.channel.join(', ') : "n/a")
                     .addField('Quote', (foundCharacter.quote) ? foundCharacter.quote : "n/a");
                     message.channel.send(embed);
                 }
@@ -762,7 +762,7 @@ function staffBotUpdateChannel(message) {
     }
     
     const cName = message.content.split('<')[1].split('>')[0];
-    const cChannel = message.content.split('>')[1].trim().replace(/\D/g,'');
+    var cChannels = message.content.substring(message.content.indexOf('>')+1).trim().split(',').map(x => x.trim());
 
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('dls_staff');
@@ -772,7 +772,7 @@ function staffBotUpdateChannel(message) {
 
             if (items.length == 1)
             {
-                col.updateOne({ _id: items[0]._id }, { $set: { channel: cChannel }}, function(err, item) {
+                col.updateOne({ _id: items[0]._id }, { $set: { channel: cChannels }}, function(err, item) {
                     if (err) throw err;
 
                     message.channel.send(`Thanks for updating ${items[0].name}'s file!`);

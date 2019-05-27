@@ -59,7 +59,11 @@ client.on('message', message => {
         jailBot(message);
     } else if (message.content.substring(0, 6) === '!staff' && process.env.STAFFBOT == 'TRUE') {
         if (message.content.substring(0,7) === '!staffU')
-            staffBotUpdate(message);
+            staffBotUpdateBio(message);
+        else if (message.content.substring(0,7) === '!staffQ')
+            staffBotUpdateQuote(message);
+        else if (message.content.substring(0,7) === '!staffC')
+            staffBotUpdateChannel(message);
         else
             staffBot(message);
     } else if (message.content.substring(0, 7) === '!record' && process.env.RECORDBOT == 'TRUE') {
@@ -656,7 +660,10 @@ function staffBot(message) {
                     const embed = new RichEmbed()
                     .setTitle(foundCharacter.name)
                     .setColor(0xFF0000)
-                    .setDescription(foundCharacter.description);
+                    .addField('Role', foundCharacter.role)
+                    .addField('Bio', foundCharacter.description)
+                    .addField('Favorite Channel', message.guild.channels.get(foundCharacter.channel).toString())
+                    .addField('Quote', foundCharacter.quote);
                     message.channel.send(embed);   
                 }
             }
@@ -666,7 +673,7 @@ function staffBot(message) {
     });
 }
 
-function staffBotUpdate(message) {
+function staffBotUpdateBio(message) {
     if (message.channel.name != 'public-records') {
         message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
         return;
@@ -684,6 +691,88 @@ function staffBotUpdate(message) {
             if (items.length == 1)
             {
                 col.updateOne({ _id: items[0]._id }, { $set: { description: cDesc }}, function(err, item) {
+                    if (err) throw err;
+
+                    message.channel.send(`Thanks for updating ${items[0].name}'s file!`);
+                    client.close();
+                })
+            }
+            else 
+            {
+                if(items.length > 1)
+                {
+                    var characters = items.map(x => x['name']);
+                    message.channel.send(`Found ${items.length} characters! Please select a single staff member`);
+                }
+                else
+                {
+                    message.channel.send("No staff member found");
+                }
+                client.close();
+            }
+        });
+    });
+}
+
+function staffBotUpdateQuote(message) {
+    if (message.channel.name != 'public-records') {
+        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+        return;
+    }
+    
+    const cName = message.content.split('<')[1].split('>')[0];
+    const cQuote = message.content.split('>')[1].trim();
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('dls_staff');
+
+        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 1)
+            {
+                col.updateOne({ _id: items[0]._id }, { $set: { quote: cQuote }}, function(err, item) {
+                    if (err) throw err;
+
+                    message.channel.send(`Thanks for updating ${items[0].name}'s file!`);
+                    client.close();
+                })
+            }
+            else 
+            {
+                if(items.length > 1)
+                {
+                    var characters = items.map(x => x['name']);
+                    message.channel.send(`Found ${items.length} characters! Please select a single staff member`);
+                }
+                else
+                {
+                    message.channel.send("No staff member found");
+                }
+                client.close();
+            }
+        });
+    });
+}
+
+function staffBotUpdateChannel(message) {
+    if (message.channel.name != 'public-records') {
+        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
+        return;
+    }
+    
+    const cName = message.content.split('<')[1].split('>')[0];
+    const cChannel = message.content.split('>')[1].trim().replace(/\D/g,'');
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('dls_staff');
+
+        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 1)
+            {
+                col.updateOne({ _id: items[0]._id }, { $set: { channel: cChannel }}, function(err, item) {
                     if (err) throw err;
 
                     message.channel.send(`Thanks for updating ${items[0].name}'s file!`);

@@ -9,6 +9,10 @@ const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 
+// Bot Libraries
+const FooBar = require('./dlsBotScripts/testbot.js');
+const CharacterBot = require('./dlsBotScripts/characterbot.js');
+
 const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6'];
 const permRoles2 = process.env.JAILPERMS.split(',');
 const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺'];
@@ -23,13 +27,13 @@ client.login(process.env.API_CLIENT_TOKEN);
 
 client.on('message', message => {
     if (message.content === '!testbot') {
-        message.channel.send(`works`);
-    } else if (message.content.substring(0, 11) === '!character ' && process.env.CHARACTERBOT == 'TRUE') {
-        characterBot(message);
+        FooBar.foo(message);
+    } else if (message.content.substring(0, 11) === '!characted ' && process.env.CHARACTERBOT == 'TRUE') {
+        CharacterBot.characterGet(message); //characterBot(message);
     } else if (message.content.substring(0, 16) === '!characterUpdate' && process.env.CHARACTERBOTUPDATE == 'TRUE') {
-        characterBotUpdate(message);
+        CharacterBot.characterUpdate(message);//characterBotUpdate(message);
     } else if (message.content.substring(0, 13) === '!characterAdd' && process.env.CHARACTERBOTADD == 'TRUE') {
-        characterBotAdd(message);
+        CharacterBot.characterAdd(message);//characterBotAdd(message);
     } else if (message.content.substring(0,6) === '!recap' && process.env.RECAPBOT == 'TRUE') {
         recapBot(message);
     } else if (message.content.substring(0, 6) === '!quote' &&
@@ -74,40 +78,6 @@ client.on('message', message => {
         rollBot(message);
     }
 });
-
-async function getCharacters(message)
-{
-    let last_id;
-    const channel = message.channel;
-
-    var c_log = fs.createWriteStream('c_log.txt', { flags: 'a' });
-
-    while (true)
-    {
-        const options = { limit : 100 };
-        if (last_id) {
-            options.before = last_id;
-        }
-
-        const mQueue = await channel.fetchMessages(options);
-        mQueue.array().every(function(m)
-        {
-            if (m.content.substring(0, 10) == '!character')
-            {
-                c_log.write(m.content + '\r\n');
-            }
-            return true;
-        });
-
-        last_id = mQueue.last().id;
-
-        if (mQueue.size != 100) {
-            break;
-        }
-    }
-
-    c_log.end();
-}
 
 function getRecorders(){
     MongoClient.connect(mongoUrl, function(err, client) {

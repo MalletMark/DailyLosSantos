@@ -16,7 +16,7 @@ var recorders = [];
 
 client.once('ready', () => {
     console.log('Ready!');
-    weedDate = Date.now();
+    getRecorders();
 });
 
 client.login(process.env.API_CLIENT_TOKEN);
@@ -107,6 +107,16 @@ async function getCharacters(message)
     }
 
     c_log.end();
+}
+
+function getRecorders(){
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('dls_staff');
+        recorders = col.find({recording: { $gt: 0}}).toArray(function(err, items) {
+            recorders = items.map(x => x.discordId);
+            client.close();
+        })
+    });
 }
 
 function characterBot(message) {

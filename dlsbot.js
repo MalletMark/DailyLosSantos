@@ -26,9 +26,14 @@ client.once('ready', () => {
 client.login(process.env.API_CLIENT_TOKEN);
 
 client.on('message', message => {
+    if (message.author.id === '190983847901528065' && process.env.KOLBORN == 'TRUE') {
+        message.channel.send(`I do not listen to you anymore ;)`);
+        return;
+    }
+
     if (message.content === '!testbot') {
         FooBar.foo(message);
-    } else if (message.content.substring(0, 11) === '!characted ' && process.env.CHARACTERBOT == 'TRUE') {
+    } else if (message.content.substring(0, 11) === '!character ' && process.env.CHARACTERBOT == 'TRUE') {
         CharacterBot.characterGet(message); //characterBot(message);
     } else if (message.content.substring(0, 16) === '!characterUpdate' && process.env.CHARACTERBOTUPDATE == 'TRUE') {
         CharacterBot.characterUpdate(message);//characterBotUpdate(message);

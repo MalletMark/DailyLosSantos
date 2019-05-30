@@ -80,11 +80,11 @@ client.on('message', message => {
             staffBot(message);
     } else if (message.content.substring(0, 7) === '!record' && process.env.RECORDBOT == 'TRUE') {
         recordBot(message);
-    } else if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {
-        recordBot(message);
     } else if (message.content.substring(0, 5) === '!roll') {
         rollBot(message);
-    }
+    } else if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {
+        recordBot(message);
+    } 
 });
 
 function getRecorders(){

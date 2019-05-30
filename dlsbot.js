@@ -15,6 +15,7 @@ const CharacterBot = require('./dlsBotScripts/characterbot.js');
 
 const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6'];
 const permRoles2 = process.env.JAILPERMS.split(',');
+const detentionList = process.env.DEADIDS.split(',');
 const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺'];
 var recorders = [];
 
@@ -26,7 +27,7 @@ client.once('ready', () => {
 client.login(process.env.API_CLIENT_TOKEN);
 
 client.on('message', message => {
-    if (message.content.substring(0, 1) === '!' && message.author.id === '190983847901528065' && process.env.KOLBORN == 'TRUE') {
+    if (message.content.substring(0, 1) === '!' && detentionList.indexOf(message.author.id) > -1) {
         message.channel.send(`I do not listen to you anymore ;)`);
         return;
     }

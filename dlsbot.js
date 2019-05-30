@@ -667,6 +667,11 @@ function rollBot(message) {
     const dNum = Number(message.content.split(' ')[1]);
     const dType = Number(message.content.split(' ')[2]);
 
+    if (dNum > 100 || dType > 100) {
+        message.channel.send(`It's too big even for me :(`);
+        return;
+    }
+
     var diceStr = [];
 
     for (var i = 0; i < dNum; i++) {

@@ -1,5 +1,3 @@
-const Discord = require('discord.js');
-
 // testbot.js
 // ========
 module.exports = {

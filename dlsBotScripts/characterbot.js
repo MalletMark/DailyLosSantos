@@ -1,18 +1,16 @@
-require('dotenv').config();
-
 const { Client, RichEmbed } = require('discord.js');
 const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 
 module.exports = {
-    characterGet: function (message) {
+    get: function (message) {
         characterGet(message);
     },
-    characterAdd: function (message) {
+    add: function (message) {
         characterAdd(message);
     },
-    characterUpdate: function(message) {
+    update: function(message) {
         characterUpdate(message);
     }
 };

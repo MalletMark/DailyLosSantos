@@ -26,7 +26,7 @@ client.once('ready', () => {
 client.login(process.env.API_CLIENT_TOKEN);
 
 client.on('message', message => {
-    if (message.author.id === '190983847901528065' && process.env.KOLBORN == 'TRUE') {
+    if (message.content.substring(0, 1) === '!' && message.author.id === '190983847901528065' && process.env.KOLBORN == 'TRUE') {
         message.channel.send(`I do not listen to you anymore ;)`);
         return;
     }

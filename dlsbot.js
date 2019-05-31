@@ -38,6 +38,8 @@ client.on('message', message => {
 
     if (message.content === '!testbot') {
         FooBar.foo(message);
+    } else if (message.content === '!bot') {
+        botHelp(message);
     } else if (message.content.substring(0, 11) === '!character ' && process.env.CHARACTERBOT == 'TRUE') {
         CharacterBot.get(message); //characterBot(message);
     } else if (message.content.substring(0, 16) === '!characterUpdate' && process.env.CHARACTERBOTUPDATE == 'TRUE') {
@@ -107,6 +109,21 @@ function getRecorders() {
 
 function hasPerm(message) {
     return permRoles2.filter(role => -1 !== message.member.roles.map(r => r.name).indexOf(role)).length > 0;
+}
+
+function botHelp(message) {
+    const embed = new RichEmbed()
+    .setTitle('Public Bot Commands')
+    .setColor(0xFF0000)
+    .addField('RecapBot', `[All Channels](https://discordapp.com/channels/571762021716983857/571916072639397888/578424038385254431)`, true)
+    .addField('QuoteBot', `[All Channels](https://discordapp.com/channels/571762021716983857/571916072639397888/576996545266712596)`, true)
+    .addField('HitlistBot', `[All Channels](https://discordapp.com/channels/571762021716983857/579761871247114283/581287232254509056)`, true)
+    .addField('CrashBot', `[All Channels](https://discordapp.com/channels/571762021716983857/571916072639397888/581208722609799198)`, true)
+    .addField('CharacterBot', `[Public-Records Only](https://discordapp.com/channels/571762021716983857/571916072639397888/579450336301940777)`, true)
+    .addField('StaffBot', `[Public-Records Only](https://discordapp.com/channels/571762021716983857/581136851654541331/582369780938440715)`, true)
+    .addField('ShipBot', `[Relationships-And-Romance Only](https://discordapp.com/channels/571762021716983857/576212143863627806/580626662807437332)`, true)
+    .setFooter('If you need more help, please contact an Editor or Reporter!');
+    message.channel.send(embed);   
 }
 
 function pixBot(message) {

@@ -17,6 +17,8 @@ module.exports = {
 };
 
 function shipBot(message) {
+    if (!channelCheck(message)) return;
+
     const sMembers = message.content.substring(6).trim().split('+').filter(function(x){ return x != ''});
     if (sMembers.length == 0) return;
 
@@ -97,6 +99,8 @@ async function shipBotReact(message, eCount, eMax) {
 }
 
 function shipBotAdd(message) {
+    if (!channelCheck(message)) return;
+
     const sName = message.content.split('<')[1].split('>')[0];
     const sCaptains = message.content.split('(')[1].split(')')[0].split(',').map(c => c.trim());
 
@@ -116,6 +120,8 @@ function shipBotAdd(message) {
 }
 
 function shipBotRemove(message) {
+    if (!channelCheck(message)) return;
+    
     const sName = message.content.split('<')[1].split('>')[0];
 
     MongoClient.connect(mongoUrl, function(err, client) {
@@ -139,4 +145,13 @@ async function shipBotJoin(col, sName, sUsers) {
             });
         })
     });
+}
+
+function channelCheck(message) {
+    if (message.channel.name != 'relationships-and-romance') {
+        message.channel.send(`Please visit <#${process.env.ROMANCE_CHANNEL_ID}>`);
+        return false;
+    }
+
+    return true;
 }

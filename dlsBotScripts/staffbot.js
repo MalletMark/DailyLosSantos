@@ -19,10 +19,7 @@ module.exports = {
 };
 
 function staffBot(message) {
-    if (message.channel.name != 'public-records') {
-        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
-        return;
-    }
+    if (!channelCheck(message)) return;
 
     const cName = message.content.substring(6).trim();
 
@@ -65,10 +62,7 @@ function staffBot(message) {
 }
 
 function staffBotUpdateBio(message) {
-    if (message.channel.name != 'public-records') {
-        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
-        return;
-    }
+    if (!channelCheck(message)) return;
     
     const cName = message.content.split('<')[1].split('>')[0];
     const cDesc = message.content.split('>')[1].trim();
@@ -106,10 +100,7 @@ function staffBotUpdateBio(message) {
 }
 
 function staffBotUpdateQuote(message) {
-    if (message.channel.name != 'public-records') {
-        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
-        return;
-    }
+    if (!channelCheck(message)) return;
     
     const cName = message.content.split('<')[1].split('>')[0];
     const cQuote = message.content.split('>')[1].trim();
@@ -147,10 +138,7 @@ function staffBotUpdateQuote(message) {
 }
 
 function staffBotUpdateChannel(message) {
-    if (message.channel.name != 'public-records') {
-        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
-        return;
-    }
+    if (!channelCheck(message)) return;
     
     const cName = message.content.split('<')[1].split('>')[0];
     var cChannels = message.content.substring(message.content.indexOf('>')+1).trim().split(',').map(x => x.trim());
@@ -185,4 +173,13 @@ function staffBotUpdateChannel(message) {
             }
         });
     });
+}
+
+function channelCheck(message) {
+    if (message.channel.name != 'public-records') {
+        message.channel.send(`Please visit <#${process.env.PUBLIC_RECORD_CHANNEL_ID}>`);
+        return false;
+    }
+
+    return true;
 }

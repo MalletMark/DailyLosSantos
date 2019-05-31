@@ -16,6 +16,7 @@ const RecapBot = require('./dlsBotScripts/recapbot.js');
 const QuoteBot = require('./dlsBotScripts/quotebot.js');
 const HitlistBot = require('./dlsBotScripts/hitlistbot.js');
 const ShipBot = require('./dlsBotScripts/shipbot.js');
+const StaffBot = require('./dlsBotScripts/staffbot.js');
 
 const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6'];
 const permRoles2 = process.env.JAILPERMS.split(',');
@@ -43,6 +44,10 @@ client.on('message', message => {
         CharacterBot.update(message);//characterBotUpdate(message);
     } else if (message.content.substring(0, 13) === '!characterAdd' && process.env.CHARACTERBOTADD == 'TRUE') {
         CharacterBot.add(message);//characterBotAdd(message);
+    } else if (message.content.substring(0, 16) === '!characterRename' && hasPerm(message) && process.env.CHARACTERBOTADD == 'TRUE') {
+        CharacterBot.rename(message);//characterBotAdd(message);
+    } else if (message.content.substring(0, 16) === '!characterRemove' && hasPerm(message) && process.env.CHARACTERBOTADD == 'TRUE') {
+        CharacterBot.remove(message);//characterBotAdd(message);
     } else if (message.content.substring(0,6) === '!recap' && process.env.RECAPBOT == 'TRUE') {
         RecapBot.get(message);
     } else if (message.content.substring(0, 6) === '!quote' &&
@@ -64,6 +69,8 @@ client.on('message', message => {
             message.content.indexOf('(') > 0 &&
             message.content.indexOf(')') > 0)
             ShipBot.add(message);
+        else if (message.content.substring(0, 9) === '!shipSink' && hasPerm(message))
+            ShipBot.remove(message);
         else
             ShipBot.poll(message);
     } else if (message.content.substring(0, 6) === '!crash' && process.env.CRASHBOT == 'TRUE') {
@@ -71,15 +78,15 @@ client.on('message', message => {
     } else if (message.content.substring(0, 5) === '!jail') {
         jailBot(message);
     } else if (message.content.substring(0, 6) === '!staff' && process.env.STAFFBOT == 'TRUE') {
-        if (message.content.substring(0,7) === '!staffU')
-            staffBotUpdateBio(message);
-        else if (message.content.substring(0,7) === '!staffQ')
-            staffBotUpdateQuote(message);
-        else if (message.content.substring(0,7) === '!staffC')
-            staffBotUpdateChannel(message);
+        if (message.content.substring(0,7) === '!staffU' && hasPerm(message))
+            StaffBot.updateBio(message);
+        else if (message.content.substring(0,7) === '!staffQ' && hasPerm(message))
+            StaffBot.updateQuote(message);
+        else if (message.content.substring(0,7) === '!staffC' && hasPerm(message))
+            StaffBot.updateChannel(message);
         else
-            staffBot(message);
-    } else if (message.content.substring(0, 7) === '!record' && process.env.RECORDBOT == 'TRUE') {
+            StaffBot.get(message);
+    } else if (message.content.substring(0, 7) === '!record' && hasPerm(message) && process.env.RECORDBOT == 'TRUE') {
         recordBot(message);
     } else if (message.content.substring(0, 5) === '!roll') {
         rollBot(message);
@@ -88,7 +95,7 @@ client.on('message', message => {
     } 
 });
 
-function getRecorders(){
+function getRecorders() {
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('dls_staff');
         recorders = col.find({recording: { $gt: 0}}).toArray(function(err, items) {
@@ -96,6 +103,10 @@ function getRecorders(){
             client.close();
         })
     });
+}
+
+function hasPerm(message) {
+    return permRoles2.filter(role => -1 !== message.member.roles.map(r => r.name).indexOf(role)).length > 0;
 }
 
 function pixBot(message) {
@@ -174,8 +185,7 @@ function crashBot(message) {
 }
 
 function jailBot(message) {
-    const hasPerm = permRoles2.filter(role => -1 !== message.member.roles.map(r => r.name).indexOf(role)).length > 0;
-    if (!hasPerm) return;
+    if (!hasPerm(message)) return;
 
     const mChannel = message.guild.channels.find(ch => ch.name === "moderation-log");
     const jOfficer = message.author.username;
@@ -202,175 +212,6 @@ function jailBot(message) {
     })
 }
 
-function staffBot(message) {
-    if (message.channel.name != 'public-records') {
-        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
-        return;
-    }
-
-    const cName = message.content.substring(6).trim();
-
-    MongoClient.connect(mongoUrl, function(err, client) {
-        const col = client.db(mongoDbName).collection('dls_staff');
-
-        col.find({ name: {'$regex': cName, '$options' : 'i'}}).toArray(function(err, items) {
-            if (err) throw err;
-
-            if (items.length == 0)
-            {
-                message.channel.send(`${cName} is not a staff member.`);
-            }
-            else if(items.length > 1)
-            {
-                var characters = items.map(x => x['name']);
-                message.channel.send(`Found ${items.length} staff members! Please try again with on of the following characters: \n ${characters.join(', ')}`);
-            }
-            else
-            {
-                const foundCharacter = items[0];
-                if (foundCharacter.description == null)
-                    message.channel.send(`No info on ${foundCharacter.name}. Add a description by typing '!characterUpdate <${foundCharacter.name}> add your description here!'`);
-                else
-                {
-                    const embed = new RichEmbed()
-                    .setTitle(foundCharacter.name)
-                    .setColor(0xFF0000)
-                    .addField('Role', foundCharacter.role)
-                    .addField('Bio', foundCharacter.description)
-                    .addField('Favorite Channel', (foundCharacter.channel) ? foundCharacter.channel.join(', ') : "n/a")
-                    .addField('Quote', (foundCharacter.quote) ? foundCharacter.quote : "n/a");
-                    message.channel.send(embed);
-                }
-            }
-        });
-
-        client.close();
-    });
-}
-
-function staffBotUpdateBio(message) {
-    if (message.channel.name != 'public-records') {
-        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
-        return;
-    }
-    
-    const cName = message.content.split('<')[1].split('>')[0];
-    const cDesc = message.content.split('>')[1].trim();
-
-    MongoClient.connect(mongoUrl, function(err, client) {
-        const col = client.db(mongoDbName).collection('dls_staff');
-
-        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
-            if (err) throw err;
-
-            if (items.length == 1)
-            {
-                col.updateOne({ _id: items[0]._id }, { $set: { description: cDesc }}, function(err, item) {
-                    if (err) throw err;
-
-                    message.channel.send(`Thanks for updating ${items[0].name}'s file!`);
-                    client.close();
-                })
-            }
-            else 
-            {
-                if(items.length > 1)
-                {
-                    var characters = items.map(x => x['name']);
-                    message.channel.send(`Found ${items.length} characters! Please select a single staff member`);
-                }
-                else
-                {
-                    message.channel.send("No staff member found");
-                }
-                client.close();
-            }
-        });
-    });
-}
-
-function staffBotUpdateQuote(message) {
-    if (message.channel.name != 'public-records') {
-        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
-        return;
-    }
-    
-    const cName = message.content.split('<')[1].split('>')[0];
-    const cQuote = message.content.split('>')[1].trim();
-
-    MongoClient.connect(mongoUrl, function(err, client) {
-        const col = client.db(mongoDbName).collection('dls_staff');
-
-        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
-            if (err) throw err;
-
-            if (items.length == 1)
-            {
-                col.updateOne({ _id: items[0]._id }, { $set: { quote: cQuote }}, function(err, item) {
-                    if (err) throw err;
-
-                    message.channel.send(`Thanks for updating ${items[0].name}'s file!`);
-                    client.close();
-                })
-            }
-            else 
-            {
-                if(items.length > 1)
-                {
-                    var characters = items.map(x => x['name']);
-                    message.channel.send(`Found ${items.length} characters! Please select a single staff member`);
-                }
-                else
-                {
-                    message.channel.send("No staff member found");
-                }
-                client.close();
-            }
-        });
-    });
-}
-
-function staffBotUpdateChannel(message) {
-    if (message.channel.name != 'public-records') {
-        message.channel.send(`Please visit ${message.guild.channels.get('581136851654541331').toString()}`);
-        return;
-    }
-    
-    const cName = message.content.split('<')[1].split('>')[0];
-    var cChannels = message.content.substring(message.content.indexOf('>')+1).trim().split(',').map(x => x.trim());
-
-    MongoClient.connect(mongoUrl, function(err, client) {
-        const col = client.db(mongoDbName).collection('dls_staff');
-
-        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
-            if (err) throw err;
-
-            if (items.length == 1)
-            {
-                col.updateOne({ _id: items[0]._id }, { $set: { channel: cChannels }}, function(err, item) {
-                    if (err) throw err;
-
-                    message.channel.send(`Thanks for updating ${items[0].name}'s file!`);
-                    client.close();
-                })
-            }
-            else 
-            {
-                if(items.length > 1)
-                {
-                    var characters = items.map(x => x['name']);
-                    message.channel.send(`Found ${items.length} characters! Please select a single staff member`);
-                }
-                else
-                {
-                    message.channel.send("No staff member found");
-                }
-                client.close();
-            }
-        });
-    });
-}
-
 function recordBot(message) {
     const rUserId = message.author.id;
     
@@ -383,7 +224,7 @@ function recordBot(message) {
                 if (err) throw err;
     
                 recorders.push(rUserId);
-                message.channel.send(`We are now recording all your message!`);
+                message.author.sendMessage(`We are now recording all your message!`);
                 fs.writeFile(fileName, 'Start of Recording. \r\n', function(err) {
                     if (err) throw err;
                     console.log('Saved!');
@@ -429,8 +270,8 @@ function recordBot(message) {
     
                     var messageCount = Number(item['recording']);
     
-                    if (messageCount >= 50 && messageCount % 50 == 0) {
-                        message.channel.send(`You have recorded ${messageCount} messages!`);
+                    if (messageCount >= 20 && messageCount % 20 == 0) {
+                        message.author.sendMessage(`You have recorded ${messageCount} messages!`);
                     }
     
                     client.close();

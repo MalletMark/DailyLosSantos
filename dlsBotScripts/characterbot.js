@@ -12,6 +12,12 @@ module.exports = {
     },
     update: function(message) {
         characterUpdate(message);
+    },
+    rename: function(message) {
+        characterRename(message);
+    },
+    remove: function(message) {
+        characterRemove(message);
     }
 };
 
@@ -109,6 +115,79 @@ function characterUpdate(message) {
                     if (err) throw err;
 
                     message.channel.send(`Thanks for updating ${items[0].name}'s file!`);
+                    client.close();
+                })
+            }
+            else 
+            {
+                if(items.length > 1)
+                {
+                    var characters = items.map(x => x['name']);
+                    message.channel.send(`Found ${items.length} characters! Please select a single character`);
+                }
+                else
+                {
+                    message.channel.send("No Characters Found");
+                }
+                client.close();
+            }
+        });
+    });
+}
+
+function characterRename(message) {
+    if (!channelCheck(message)) return;
+    
+    const cName = message.content.split('<')[1].split('>')[0];
+    const nName = message.content.split('>')[1].trim();
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_characters');
+
+        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 1)
+            {
+                col.updateOne({ _id: items[0]._id }, { $set: { name: nName }}, function(err, item) {
+                    if (err) throw err;
+
+                    message.channel.send(`Thanks for updating ${items[0].name}'s file!`);
+                    client.close();
+                })
+            }
+            else 
+            {
+                if(items.length > 1)
+                {
+                    var characters = items.map(x => x['name']);
+                    message.channel.send(`Found ${items.length} characters! Please select a single character`);
+                }
+                else
+                {
+                    message.channel.send("No Characters Found");
+                }
+                client.close();
+            }
+        });
+    });
+}
+
+function characterRemove(message) {
+    if (!channelCheck(message)) return;
+    
+    const cName = message.content.split('<')[1].split('>')[0];
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_characters');
+
+        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
+            if (err) throw err;
+
+            if (items.length == 1)
+            {
+                col.deleteOne({_id: items[0]._id }, function (err, result){
+                    message.channel.send(`${cName}'s file has been destroyed!`)    
                     client.close();
                 })
             }

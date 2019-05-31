@@ -10,6 +10,9 @@ module.exports = {
     },
     add: function(message) {
         shipBotAdd(message);
+    },
+    remove: function(message) {
+        shipBotRemove(message);
     }
 };
 
@@ -107,6 +110,19 @@ function shipBotAdd(message) {
 
         col.insertOne(shipObj, function (err, result){
             message.channel.send(`:ship:~${sName}~:ship: has sailed!`)    
+            client.close();
+        })
+    });
+}
+
+function shipBotRemove(message) {
+    const sName = message.content.split('<')[1].split('>')[0];
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        const col = client.db(mongoDbName).collection('nopixel_shiplist');
+
+        col.deleteOne({ name: sName }, function (err, result){
+            message.channel.send(`:ship:~${sName}~:ship: has sunk!`)    
             client.close();
         })
     });

@@ -72,11 +72,13 @@ function gambleDice(message) {
                 var sUsers = react.users.filter(u => u.id != '575569539027304448');
 
                 sUsers.forEach(function(user) {
-                    var gambler = {};
-                    gambler['username'] = user.username;
-                    gambler['id'] = user.id;
-                    gambler['roll'] = diceRoll(1, 100)[0];
-                    sGamblers.push(gambler);
+                    if (sGamblers.filter(x=>x.username == user.username).length == 0) {
+                        var gambler = {};
+                        gambler['username'] = user.username;
+                        gambler['id'] = user.id;
+                        gambler['roll'] = diceRoll(1, 100)[0];
+                        sGamblers.push(gambler);
+                    }
                 });
             });
 

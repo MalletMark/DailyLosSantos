@@ -54,6 +54,13 @@ function diceRoll(diceNum, diceType) {
 
 function gambleDice(message) {
     const pot = Number(message.content.trim().split(' ')[1]);
+    if (pot > 500) {
+        message.channel.send(`Don't be greedy!`); return;
+    }
+
+    if (pot < 1) {
+        message.channel.send(`Don't be pepega!`); return;
+    }
 
     message.channel.send(`Let's Wool Dat Shit! \nHit that dice reaction to join and bet ${pot}\nRoll starts in 15 seconds!`).then((sMessage) => {
         sMessage.react('🎲');

@@ -17,6 +17,7 @@ const QuoteBot = require('./dlsBotScripts/quotebot.js');
 const HitlistBot = require('./dlsBotScripts/hitlistbot.js');
 const ShipBot = require('./dlsBotScripts/shipbot.js');
 const StaffBot = require('./dlsBotScripts/staffbot.js');
+const GambleBot = require('./dlsBotScripts/gamblebot.js');
 
 const permRoles = ['Reporter', 'Source', 'Editors', 'Editor-in-Chief', 'MEE6'];
 const permRoles2 = process.env.JAILPERMS.split(',');
@@ -91,10 +92,22 @@ client.on('message', message => {
     } else if (message.content.substring(0, 7) === '!record' && hasPerm(message) && process.env.RECORDBOT == 'TRUE') {
         recordBot(message);
     } else if (message.content.substring(0, 5) === '!roll') {
-        rollBot(message);
-    } else if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {
-        recordBot(message);
-    } 
+        GambleBot.roll(message);
+    } else if (message.content.substring(0, 12) === '!gamble_dice' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
+        GambleBot.gamble_dice(message);
+    } else if (message.content.substring(0, 5) === '!cash') {
+        GambleBot.getCash(message);
+    }else {
+        if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {
+            recordBot(message);
+        } 
+    }
+});
+
+client.on('messageReactionAdd', (reaction, user) => {
+    if (reaction.emoji.name === '🎲') {
+        GambleBot.initCash(user.id);
+    }
 });
 
 function getRecorders() {
@@ -296,22 +309,4 @@ function recordBot(message) {
             });
         }
     });
-}
-
-function rollBot(message) {
-    const dNum = Number(message.content.split(' ')[1]);
-    const dType = Number(message.content.split(' ')[2]);
-
-    if (dNum > 100 || dType > 100) {
-        message.channel.send(`It's too big even for me :(`);
-        return;
-    }
-
-    var diceStr = [];
-
-    for (var i = 0; i < dNum; i++) {
-        diceStr.push(Math.floor(Math.random() * dType) + 1);
-    }
-
-    message.channel.send(`You rolled a ${diceStr.join(', ')}`);
 }

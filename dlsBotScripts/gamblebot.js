@@ -85,7 +85,7 @@ function gambleDice(message) {
             const numWinners = sGamblers.map(x=>x.roll).filter(x=>x == highScore).length;
             const winningTitle = (numWinners == 1) ? 
                 `${sGamblers[0].username} has won $${pot * (sGamblers.length - 1)}` :
-                `${sGamblers.filter(x=>x.roll == highScore).map(x=>x.username).join(', ')} has won $${((pot * sGamblers.length) / numWinners) - pot}`;
+                `${sGamblers.filter(x=>x.roll == highScore).map(x=>x.username).join(', ')} has won $${((pot * sGamblers.length) / numWinners)}`;
             updateGamblers(pot, highScore, numWinners, sGamblers);
             
             var embed = new RichEmbed()

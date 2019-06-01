@@ -25,14 +25,10 @@ function rollBot(message) {
     if (isNaN(dNum) || isNaN(dType)) {
         message.channel.send(`Why are you being pepega?`);
         return;
-    } 
-
-    if (dNum > 100 || dType > 100) {
+    } else if (dNum > 10 || dType > 100) {
         message.channel.send(`It's too big even for me :(`);
         return;
-    }
-
-    if (dNum < 1 || dType < 1) {
+    } else if (dNum < 1 || dType < 1) {
         message.channel.send(`It's too small even for me :(`);
         return;
     }
@@ -53,16 +49,18 @@ function diceRoll(diceNum, diceType) {
 }
 
 function gambleDice(message) {
+    if (!channelCheck(message)) return;
+
     const pot = Number(message.content.trim().split(' ')[1]);
     if (isNaN(pot)) {
         message.channel.send(`Don't be pepega!`); return;
-    } else if (pot > 500) {
-        message.channel.send(`Don't be greedy!`); return;
+    } else if (pot > 1000) {
+        message.channel.send(`$1000 Max!`); return;
     } else if (pot < 1) {
-        message.channel.send(`Don't be pepega!`); return;
+        message.channel.send(`We don't accept bus tokens...`); return;
     }
 
-    message.channel.send(`Let's Wool Dat Shit! \nHit that dice reaction to join and bet ${pot}\nRoll starts in 15 seconds!`).then((sMessage) => {
+    message.channel.send(`Boom, Wool Dat Shit! \nHit that dice reaction to join and bet ${pot}\nRoll starts in 15 seconds!`).then((sMessage) => {
         sMessage.react('🎲');
         const filter = (reaction, user) => ({});
         
@@ -77,21 +75,26 @@ function gambleDice(message) {
                     var gambler = {};
                     gambler['username'] = user.username;
                     gambler['id'] = user.id;
-                    gambler['roll'] = diceRoll(1, 100)[0];
+                    gambler['roll'] = 30 //diceRoll(1, 100)[0];
                     sGamblers.push(gambler);
                 });
             });
 
             sGamblers.sort(function(a, b){ return b.roll >= a.roll });
-            updateGamblers(pot, sGamblers);
+            const highScore = sGamblers[0].roll;
+            const numWinners = sGamblers.map(x=>x.roll).filter(x=>x == highScore).length;
+            const winningTitle = (numWinners == 1) ? 
+                `${sGamblers[0].username} has won $${pot * (sGamblers.length - 1)}` :
+                `${sGamblers.filter(x=>x.roll == highScore).map(x=>x.username).join(', ')} has won $${((pot * sGamblers.length) / numWinners) - pot}`;
+            updateGamblers(pot, highScore, numWinners, sGamblers);
             
             var embed = new RichEmbed()
-            .setTitle( `${sGamblers[0].username} has won $${pot * (sGamblers.length - 1)}`)
+            .setTitle(winningTitle)
             .setColor(0xFF25C0)
             .setDescription(sGamblers.reduce(function(rolls, gambler) {
                 return rolls += `\n${gambler.username} rolled a ${gambler.roll}`;
             }, ""))
-            .setFooter('!cash <@username> to get your balance');
+            .setFooter('!cash @username to get your balance');
            
             sMessage.channel.send(embed);
         })
@@ -99,11 +102,12 @@ function gambleDice(message) {
     });
 }
 
-function updateGamblers(pot, sGamblers) {
+function updateGamblers(pot, highScore, numWinners, sGamblers) {
     var index = 0;
+
     for (const gambler of sGamblers) {
-        if (index++ == 0) {
-            updateCash(sGamblers[0].id, pot * (sGamblers.length - 1));
+        if (gambler.roll == highScore) {
+            updateCash(sGamblers[0].id, ((pot * sGamblers.length) / numWinners) - pot);
         } else {
             updateCash(gambler.id, -pot);
         }
@@ -174,4 +178,13 @@ function updateAllCash(cash) {
             client.close();
         })
     });
+}
+
+function channelCheck(message) {
+    if (message.channel.name != 'office-of-kevin-shaw') {
+        message.channel.send(`Please visit <#${process.env.SHAW_OFFICE_ID}>`);
+        return false;
+    }
+
+    return true;
 }

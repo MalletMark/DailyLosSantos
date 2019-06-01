@@ -95,7 +95,7 @@ client.on('message', message => {
         GambleBot.roll(message);
     } else if (message.content.substring(0, 12) === '!gamble_dice' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.gamble_dice(message);
-    } else if (message.content.substring(0, 5) === '!cash') {
+    } else if (message.content.substring(0, 5) === '!cash' && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.getCash(message);
     }else {
         if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {

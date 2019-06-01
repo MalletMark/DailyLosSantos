@@ -75,7 +75,7 @@ function gambleDice(message) {
                     var gambler = {};
                     gambler['username'] = user.username;
                     gambler['id'] = user.id;
-                    gambler['roll'] = 30 //diceRoll(1, 100)[0];
+                    gambler['roll'] = diceRoll(1, 100)[0];
                     sGamblers.push(gambler);
                 });
             });

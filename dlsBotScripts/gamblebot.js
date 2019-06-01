@@ -125,7 +125,7 @@ function updateCash(dId, cash) {
 }
 
 function getCash(message) {
-    const jId = message.content.substring(5).split('<@')[1].split('>')[0];
+    const jId = message.content.substring(5).split('<@')[1].split('>')[0].replace('!','');
 
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(

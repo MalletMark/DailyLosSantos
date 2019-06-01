@@ -2,6 +2,7 @@ const { Client, RichEmbed } = require('discord.js');
 const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
+const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺'];
 
 module.exports = {
     roll: function (message) {
@@ -15,8 +16,27 @@ module.exports = {
     },
     gamble_dice: function(message) {
         gambleDice(message);
+    },
+    gamble_race: function(message) {
+        gambleRace(message);
     }
 };
+
+function diceRoll(diceNum, diceType) {
+    var diceStr = [];
+
+    for (var i = 0; i < diceNum; i++) {
+        diceStr.push(Math.floor(Math.random() * diceType) + 1);
+    }
+
+    return diceStr;
+}
+
+async function setOptionsReact(message, eCount, eMax) {
+    while (eCount++ < eMax) {
+        await message.react(`${voteOptions[eCount-1]}`);
+    }
+}
 
 function rollBot(message) {
     const dNum = Number(message.content.split(' ')[1]);
@@ -36,16 +56,6 @@ function rollBot(message) {
     diceStr = diceRoll(dNum, dType);
 
     message.channel.send(`You rolled a ${diceStr.join(', ')}`);
-}
-
-function diceRoll(diceNum, diceType) {
-    var diceStr = [];
-
-    for (var i = 0; i < diceNum; i++) {
-        diceStr.push(Math.floor(Math.random() * diceType) + 1);
-    }
-
-    return diceStr;
 }
 
 function gambleDice(message) {
@@ -104,12 +114,109 @@ function gambleDice(message) {
     });
 }
 
-function updateGamblers(pot, highScore, numWinners, sGamblers) {
-    var index = 0;
+function gambleRace(message) {
+    const horseEmoji = '🐎';
+    if (!channelCheck(message)) return;
 
+    const pot = Number(message.content.trim().split(' ')[1]);
+    if (isNaN(pot)) {
+        message.channel.send(`Don't be pepega!`); return;
+    } else if (pot > 10000) {
+        message.channel.send(`$10000 Max!`); return;
+    } else if (pot < 1) {
+        message.channel.send(`We don't accept bus tokens...`); return;
+    }
+
+    message.channel.send(`Horses are at the ready! \nHit that react to choose your horse and bet ${pot}\nRace starts in 30 seconds!`).then((sMessage) => {
+        setOptionsReact(sMessage, 0, 4);
+        const filter = (reaction, user) => ({});
+        
+        sMessage.awaitReactions(filter, { time: 30000 })
+        .then((collected) => {
+            var sGamblers = [];
+            
+            collected.array().forEach(function(react) {
+                var sUsers = react.users.filter(u => u.id != '575569539027304448');
+
+                sUsers.forEach(function(user) {
+                    var gambler = {};
+                    gambler['username'] = user.username;
+                    gambler['id'] = user.id;
+                    gambler['horse'] = voteOptions.indexOf(react.emoji.name);
+                    sGamblers.push(gambler);
+                });
+            });
+
+            var horseStatus = [0, 0, 0, 0];
+            sMessage.channel.send('The Race has Started!').then((nMessage) => {
+                setTimeout(function(){
+                    updateHorseEmbed(sGamblers, pot, horseStatus, nMessage)
+                }, 2000);
+            });
+        })
+        .catch(console.error);
+    });
+}
+
+function updateHorseEmbed(sGamblers, pot, horseStatus, message) {
+    const wHorse = Math.floor(Math.random() * 4);
+    horseStatus[wHorse]++;
+
+    var field = [];
+    var stretch = "";
+    for (var i = 0; i < 4; i++)
+    {
+        stretch = "~.~.~.~.~.~.~.~.~.#";
+        stretch = voteOptions[i] + stretch.substring(0, (horseStatus[i]*2)) + '🐎' + stretch.substring((horseStatus[i]*2));
+        field.push(stretch);
+    }
+
+    var embed = new RichEmbed();
+
+    if (horseStatus.every(h => h < 10)) {
+        embed.setTitle('The Race is on!')
+        embed.setColor(0xFF25C0);
+        embed.setDescription(field.join('\n'));
+        setTimeout(function() {
+            message.edit(embed).then((nMessage) => {
+                updateHorseEmbed(sGamblers, pot, horseStatus, nMessage)
+            });
+        }, 1300);
+    } else {
+        var winner = horseStatus.indexOf(10);
+        var winnerCount = 0;
+        embed.setTitle(`Horse ${voteOptions[winner]} has won!`)
+        embed.setColor(0xFF25C0);
+        embed.setDescription(field.join('\n'));
+        message.edit(embed);
+        
+        sGamblers.forEach(function(gambler, index) {
+            if (gambler.horse === winner) {
+                sGamblers[index].roll = 2;
+                winnerCount++;
+            } else {
+                sGamblers[index].roll = 1;
+            }
+        })
+        
+        var potWinnings = Number((((pot * sGamblers.length) / winnerCount) * 100) / 100).toFixed(2);
+        updateGamblers(pot, potWinnings, 2, winnerCount, sGamblers);
+        console.log(sGamblers);
+
+        setTimeout(() => {
+            const winningMsg = (winnerCount > 0) ? 
+            `${sGamblers.filter(x=>x.roll == 2).map(z=>z.username).join(', ')} has won $${potWinnings}` :
+            'No winners today :(';
+            
+            message.channel.send(winningMsg);
+        }, 1000);
+    }
+}
+
+function updateGamblers(pot, potWinnings, highScore, numWinners, sGamblers) {
     for (const gambler of sGamblers) {
-        if (gambler.roll == highScore) {
-            updateCash(sGamblers[0].id, ((pot * sGamblers.length) / numWinners) - pot);
+        if (gambler.roll == highScore && numWinners > 0) {
+            updateCash(sGamblers[0].id, (potWinnings - pot));
         } else {
             updateCash(gambler.id, -pot);
         }

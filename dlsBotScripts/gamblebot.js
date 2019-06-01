@@ -137,7 +137,7 @@ function getCash(message) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
             { discordId: jId }, 
             {
-                $setOnInsert: { bank: 5000 }
+                $setOnInsert: { bank: 10000 }
             },
             { 
                 projection: { bank: 1 },
@@ -157,7 +157,7 @@ function initializeCash(jId) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
         { discordId: jId }, 
         { 
-            $setOnInsert: { bank: 5000 },
+            $setOnInsert: { bank: 10000 },
         }, 
         { upsert: true }, 
         function (err, result) {
@@ -178,6 +178,14 @@ function updateAllCash(cash) {
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_gambling').updateMany({}, { $inc: { bank: cash }}, function (err, result){
             client.close();
+        })
+    });
+}
+
+function debtList(message) {
+    MongoClient.connect(mongoUrl, function(err, client) {
+        client.db(mongoDbName).collection('dls_gambling').find({bank: { $lt: 0 }}, function (err, result){
+            message.channel.send(``)
         })
     });
 }

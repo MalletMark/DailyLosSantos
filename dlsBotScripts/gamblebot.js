@@ -55,11 +55,11 @@ function diceRoll(diceNum, diceType) {
 function gambleDice(message) {
     const pot = Number(message.content.trim().split(' ')[1]);
 
-    message.channel.send(`Let's Wool Dat Shit! \nHit that dice reaction to join and bet ${pot}`).then((sMessage) => {
+    message.channel.send(`Let's Wool Dat Shit! \nHit that dice reaction to join and bet ${pot}\nRoll starts in 15 seconds!`).then((sMessage) => {
         sMessage.react('🎲');
         const filter = (reaction, user) => ({});
         
-        sMessage.awaitReactions(filter, { time: 5000 })
+        sMessage.awaitReactions(filter, { time: 15000 })
         .then((collected) => {
             var sGamblers = [];
             

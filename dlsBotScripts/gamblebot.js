@@ -8,8 +8,8 @@ module.exports = {
     roll: function (message) {
         rollBot(message);
     },
-    initCash: function(message) {
-        initializeCash(message);
+    initCash: function(id, username) {
+        initializeCash(id, username);
     },
     getCash: function(message) {
         getCash(message);
@@ -19,6 +19,9 @@ module.exports = {
     },
     gamble_race: function(message) {
         gambleRace(message);
+    },
+    kick_broke: function(message) {
+        debtList(message);
     }
 };
 
@@ -296,9 +299,20 @@ function updateAllCash(cash) {
 
 function debtList(message) {
     MongoClient.connect(mongoUrl, function(err, client) {
-        client.db(mongoDbName).collection('dls_gambling').find({bank: { $lt: 0 }}, function (err, result){
-            message.channel.send(``)
-        })
+        client.db(mongoDbName).collection('dls_gambling').find({bank: { $lt: 0 }}).toArray(function (err, results){
+            client.close();
+            if (results.length > 0)
+            {
+                message.channel.send(`The following people are broke and need to leave.\n${results.map(x=>x.discordName).join(', ')}`);
+
+                // results.forEach(function(user) {
+                //     member = message.guild.members.get(user.discordId);
+                //     member.setVoiceChannel('580951382282993679');
+                // })
+            }
+
+            client.close();
+        });
     });
 }
 

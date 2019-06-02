@@ -4,6 +4,7 @@ const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺'];
 const raceAnimals = ['🐎', '🐕', '🐅', '🐐'];
+var eventDefault = 0;
 
 module.exports = {
     roll: function (message) {
@@ -23,6 +24,18 @@ module.exports = {
     },
     kick_broke: function(message) {
         debtList(message.channel, Number(message.content.split(' ')[1]));
+    },
+    start: function(message) {
+        startEvent(message);
+    },
+    end: function(message) {
+        endEvent(message);
+    },
+    give_all: function(message) {
+        updateAllCash(Number(message.content.split(' ')[1]));
+    },
+    set_all: function(message) {
+        setAllCash(Number(message.content.split(' ')[1]));
     }
 };
 
@@ -274,7 +287,7 @@ function getCash(message) {
     getBalance(message.author.id).then(balance => {
         if (balance == null) {
             initializeCash(message.author.id, message.author.username);
-            message.channel.send(`${message.author.username} has $10000.00`);
+            message.channel.send(`${message.author.username} has $${(eventDefault > 0) ? eventDefault : process.env.DEFAULT_CASH}`);
         }
         message.channel.send(`${balance.discordName} has $${balance.bank.toFixed(2)}`);
     })
@@ -292,7 +305,7 @@ function initializeCash(jId, jName) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
         { discordId: jId, discordName: jName }, 
         { 
-            $setOnInsert: { bank: Number(process.env.DEFAULT_CASH) },
+            $setOnInsert: { bank: (eventDefault > 0) ? eventDefault : Number(process.env.DEFAULT_CASH) },
         }, 
         { upsert: true }, 
         function (err, result) {
@@ -314,6 +327,40 @@ function updateAllCash(cash) {
         client.db(mongoDbName).collection('dls_gambling').updateMany({}, { $inc: { bank: cash }}, function (err, result){
             client.close();
         })
+    });
+}
+
+function startEvent(message) {
+    if (!channelCheck(message)) return;
+
+    const pot = Number(message.content.trim().split(' ')[1]);
+    if (isNaN(pot)) {
+        message.channel.send(`Don't be pepega!`); return;
+    } else if (pot > 100000) {
+        message.channel.send(`$100000 Max!`); return;
+    } else if (pot < 1) {
+        message.channel.send(`We don't accept bus tokens...`); return;
+    }
+
+    eventDefault = pot;
+    setAllCash(eventDefault);
+}
+
+function endEvent(message) {
+    if (!channelCheck(message)) return;
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        client.db(mongoDbName).collection('dls_gambling').find({}).sort({bank: -1}).limit(1).toArray(function (err, result) {
+            delete result[0]._id;
+            result[0].date_won = new Date();
+            message.channel.send(`The event winner is <@${result[0].discordId}> with a total of $${result[0].bank}! See you all in the next event!`)
+            
+            client.db(mongoDbName).collection('dls_gambling_leaders').insertOne(result[0], function(err, res) {
+                if (err) throw err;
+                setAllCash((eventDefault > 0) ? eventDefault : Number(process.env.DEFAULT_CASH));
+                client.close();
+            });
+        });
     });
 }
 

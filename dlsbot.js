@@ -93,14 +93,18 @@ client.on('message', message => {
         recordBot(message);
     } else if (message.content.substring(0, 5) === '!roll') {
         GambleBot.roll(message);
-    } else if (message.content.substring(0, 12) === '!gamble_dice' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
+    } else if (message.content.substring(0, 12) === '!gamble_dide' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.gamble_dice(message);
-    } else if (message.content.substring(0, 12) === '!gamble_race' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
+    } else if (message.content.substring(0, 12) === '!gamble_rade' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.gamble_race(message);
-    } else if (message.content.substring(0, 5) === '!cash' && process.env.GAMBLEBOT == 'TRUE') {
-        GambleBot.getCash(message);
+    } else if (message.content.substring(0, 11) === '!gamble_end' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
+        GambleBot.end(message);
+    } else if (message.content.substring(0, 13) === '!gamble_start' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
+        GambleBot.start(message);
     } else if (message.content.substring(0, 12) === '!gamble_kick' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.kick_broke(message);
+    } else if (message.content.substring(0, 5) === '!cash' && process.env.GAMBLEBOT == 'TRUE') {
+        GambleBot.getCash(message);
     } else {
         if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {
             recordBot(message);

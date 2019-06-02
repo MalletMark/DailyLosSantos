@@ -131,19 +131,24 @@ function gambleRace(message) {
         setOptionsReact(sMessage, 0, 4);
         const filter = (reaction, user) => ({});
         
-        sMessage.awaitReactions(filter, { time: 30000 })
+        sMessage.awaitReactions(filter, { time: 10000 })
         .then((collected) => {
             var sGamblers = [];
             
             collected.array().forEach(function(react) {
                 var sUsers = react.users.filter(u => u.id != '575569539027304448');
+                var gambler = {};
 
                 sUsers.forEach(function(user) {
-                    var gambler = {};
-                    gambler['username'] = user.username;
-                    gambler['id'] = user.id;
-                    gambler['horse'] = voteOptions.indexOf(react.emoji.name);
-                    sGamblers.push(gambler);
+                    gambler = {};
+                    if (sGamblers.filter(x=>x.id == user.id).length == 0)
+                    {
+                        gambler['username'] = user.username;
+                        gambler['id'] = user.id;
+                        gambler['horse'] = voteOptions.indexOf(react.emoji.name);
+                        sGamblers.push(gambler);
+                        initializeCash(user.id, user.username);
+                    }
                 });
             });
 
@@ -259,10 +264,10 @@ function getCash(message) {
     });
 }
 
-function initializeCash(jId) {
+function initializeCash(jId, jName) {
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
-        { discordId: jId }, 
+        { discordId: jId, discordName: jName }, 
         { 
             $setOnInsert: { bank: 10000 },
         }, 

@@ -108,7 +108,7 @@ client.on('message', message => {
 
 client.on('messageReactionAdd', (reaction, user) => {
     if (reaction.emoji.name === '🎲') {
-        GambleBot.initCash(user.id);
+        GambleBot.initCash(user.id, user.username);
     }
 });
 

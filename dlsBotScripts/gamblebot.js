@@ -3,6 +3,7 @@ const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺'];
+const raceAnimals = ['🐎', '🐕', '🐅', '🐐'];
 
 module.exports = {
     roll: function (message) {
@@ -21,7 +22,7 @@ module.exports = {
         gambleRace(message);
     },
     kick_broke: function(message) {
-        debtList(message);
+        debtList(message.channel, Number(message.content.split(' ')[1]));
     }
 };
 
@@ -35,9 +36,9 @@ function diceRoll(diceNum, diceType) {
     return diceStr;
 }
 
-async function setOptionsReact(message, eCount, eMax) {
+async function setRaceOptions(message, eCount, eMax) {
     while (eCount++ < eMax) {
-        await message.react(`${voteOptions[eCount-1]}`);
+        await message.react(`${raceAnimals[eCount-1]}`);
     }
 }
 
@@ -75,7 +76,7 @@ function gambleDice(message) {
 
     message.channel.send(`Boom, Wool Dat Shit! \nHit that dice reaction to join and bet ${pot}\nRoll starts in 15 seconds!`).then((sMessage) => {
         sMessage.react('🎲');
-        const filter = (reaction, user) => ({});
+        const filter = (reaction, user) => reaction.emoji.name == '🎲';
         
         sMessage.awaitReactions(filter, { time: 15000 })
         .then((collected) => {
@@ -84,43 +85,56 @@ function gambleDice(message) {
             collected.array().forEach(function(react) {
                 var sUsers = react.users.filter(u => u.id != '575569539027304448');
 
-                sUsers.forEach(function(user) {
-                    if (sGamblers.filter(x=>x.username == user.username).length == 0) {
-                        var gambler = {};
-                        gambler['username'] = user.username;
-                        gambler['id'] = user.id;
-                        gambler['roll'] = diceRoll(1, 100)[0];
-                        sGamblers.push(gambler);
-                        initializeCash(user.id, user.username);
-                    }
-                });
+                for (let user of sUsers) {
+                    getBalance(user[1].id).then(balance => {
+                        if (sGamblers.filter(x=>x.username == user[1].username).length == 0) {
+                            if (balance == null) {
+                                initializeCash(user[1].id, user[1].username);
+                            }
+                            else if (balance.bank >= pot) {
+                                var gambler = {};
+                                gambler['username'] = user[1].username;
+                                gambler['id'] = user[1].id;
+                                gambler['roll'] = diceRoll(1, 100)[0];
+                                sGamblers.push(gambler);
+                            }
+                        }
+                    })
+                }
             });
 
-            sGamblers.sort(function(a, b){ return b.roll >= a.roll });
-            const highScore = sGamblers[0].roll;
-            const numWinners = sGamblers.map(x=>x.roll).filter(x=>x == highScore).length;
-            const potWinnings = ((pot * sGamblers.length) / numWinners);
-            const winningTitle = (numWinners == 1) ? 
-                `${sGamblers[0].username} has won $${pot * sGamblers.length}` :
-                `${sGamblers.filter(x=>x.roll == highScore).map(x=>x.username).join(', ')} has won $${((pot * sGamblers.length) / numWinners)}`;
-            updateGamblers(pot, potWinnings, highScore, numWinners, sGamblers);
+            setTimeout(() => {
+                if (sGamblers.length == 0) return;
+
+                sGamblers.sort(function(a, b){ return b.roll >= a.roll });
+                const highScore = sGamblers[0].roll;
+                const numWinners = sGamblers.map(x=>x.roll).filter(x=>x == highScore).length;
+                const potWinnings = ((pot * sGamblers.length) / numWinners);
+                const winningTitle = (numWinners == 1) ? 
+                    `${sGamblers[0].username} has won $${pot * sGamblers.length}` :
+                    `${sGamblers.filter(x=>x.roll == highScore).map(x=>x.username).join(', ')} has won $${((pot * sGamblers.length) / numWinners)}`;
+                updateGamblers(pot, potWinnings, highScore, numWinners, sGamblers);
+                
+                var embed = new RichEmbed()
+                .setTitle(winningTitle)
+                .setColor(0xFF25C0)
+                .setDescription(sGamblers.reduce(function(rolls, gambler) {
+                    return rolls += `\n${gambler.username} rolled a ${gambler.roll}`;
+                }, ""))
+                .setFooter('!cash to check you balance');
             
-            var embed = new RichEmbed()
-            .setTitle(winningTitle)
-            .setColor(0xFF25C0)
-            .setDescription(sGamblers.reduce(function(rolls, gambler) {
-                return rolls += `\n${gambler.username} rolled a ${gambler.roll}`;
-            }, ""))
-            .setFooter('!cash @username to get your balance');
-           
-            sMessage.channel.send(embed);
+                sMessage.channel.send(embed).then((nMessage) => {
+                    setTimeout(function(){
+                        debtList(nMessage.channel, pot);
+                    }, 2000);
+                });
+            }, 1000);
         })
         .catch(console.error);
     });
 }
 
 function gambleRace(message) {
-    const horseEmoji = '🐎';
     if (!channelCheck(message)) return;
 
     const pot = Number(message.content.trim().split(' ')[1]);
@@ -132,11 +146,11 @@ function gambleRace(message) {
         message.channel.send(`We don't accept bus tokens...`); return;
     }
 
-    message.channel.send(`Horses are at the ready! \nHit that react to choose your horse and bet ${pot}\nRace starts in 30 seconds!`).then((sMessage) => {
-        setOptionsReact(sMessage, 0, 4);
+    message.channel.send(`Horses are at the ready! \nHit that react to choose your (1) racer to bet ${pot}\nRace starts in 30 seconds!`).then((sMessage) => {
+        setRaceOptions(sMessage, 0, 4);
         const filter = (reaction, user) => ({});
         
-        sMessage.awaitReactions(filter, { time: 30000 })
+        sMessage.awaitReactions(filter, { time: 10000 })
         .then((collected) => {
             var sGamblers = [];
             
@@ -144,17 +158,22 @@ function gambleRace(message) {
                 var sUsers = react.users.filter(u => u.id != '575569539027304448');
                 var gambler = {};
 
-                sUsers.forEach(function(user) {
-                    gambler = {};
-                    if (sGamblers.filter(x=>x.id == user.id).length == 0)
-                    {
-                        gambler['username'] = user.username;
-                        gambler['id'] = user.id;
-                        gambler['horse'] = voteOptions.indexOf(react.emoji.name);
-                        sGamblers.push(gambler);
-                        initializeCash(user.id, user.username);
-                    }
-                });
+                for (const user of sUsers) {
+                    getBalance(user[1].id).then(balance => {
+                        if (sGamblers.filter(x=>x.username == user[1].username).length == 0) {
+                            if (balance == null) {
+                                initializeCash(user[1].id, user[1].username);
+                            }
+                            else if (balance.bank >= pot) { 
+                                var gambler = {};
+                                gambler['username'] = user[1].username;
+                                gambler['id'] = user[1].id;
+                                gambler['horse'] = raceAnimals.indexOf(react.emoji.name);
+                                sGamblers.push(gambler);
+                            }
+                        }
+                    });
+                }
             });
 
             var horseStatus = [0, 0, 0, 0];
@@ -176,8 +195,8 @@ function updateHorseEmbed(sGamblers, pot, horseStatus, message) {
     var stretch = "";
     for (var i = 0; i < 4; i++)
     {
-        stretch = "~.~.~.~.~.~.~.~.~.#";
-        stretch = voteOptions[i] + stretch.substring(0, (horseStatus[i]*2)) + '🐎' + stretch.substring((horseStatus[i]*2));
+        stretch = "~.~.~.~.~.~.~.~.~.~.";
+        stretch = stretch.substring(0, (horseStatus[i]*2)) + raceAnimals[i] + stretch.substring((horseStatus[i]*2)) + '🏳️';
         field.push(stretch);
     }
 
@@ -195,7 +214,7 @@ function updateHorseEmbed(sGamblers, pot, horseStatus, message) {
     } else {
         var winner = horseStatus.indexOf(10);
         var winnerCount = 0;
-        embed.setTitle(`Horse ${voteOptions[winner]} has won!`)
+        embed.setTitle(`${raceAnimals[winner]} has won!`)
         embed.setColor(0xFF25C0);
         embed.setDescription(field.join('\n'));
         message.edit(embed);
@@ -209,24 +228,28 @@ function updateHorseEmbed(sGamblers, pot, horseStatus, message) {
             }
         })
         
-        var potWinnings = Number((((pot * sGamblers.length) / winnerCount) * 100) / 100).toFixed(2);
+        var potWinnings = (winnerCount > 0) ? Number((pot * sGamblers.length) / winnerCount) : Number(pot * sGamblers.length);
         updateGamblers(pot, potWinnings, 2, winnerCount, sGamblers);
         console.log(sGamblers);
 
         setTimeout(() => {
             const winningMsg = (winnerCount > 0) ? 
             `${sGamblers.filter(x=>x.roll == 2).map(z=>z.username).join(', ')} has won $${potWinnings}` :
-            'No winners today :(';
+            'No winners today :( \n!cash to check you balance';
             
-            message.channel.send(winningMsg);
+            message.channel.send(winningMsg).then((nMessage) => {
+                setTimeout(function(){
+                    debtList(nMessage.channel, pot);
+                }, 2000);
+            });
         }, 1000);
     }
 }
 
 function updateGamblers(pot, potWinnings, highScore, numWinners, sGamblers) {
-    for (const gambler of sGamblers) {
+    for (let gambler of sGamblers) {
         if (gambler.roll == highScore && numWinners > 0) {
-            updateCash(sGamblers[0].id, (potWinnings - pot));
+            updateCash(gambler.id, (potWinnings - pot));
         } else {
             updateCash(gambler.id, -pot);
         }
@@ -248,26 +271,20 @@ function updateCash(dId, cash) {
 }
 
 function getCash(message) {
-    const jId = message.content.substring(5).split('<@')[1].split('>')[0].replace('!','');
-    const member = message.guild.members.get(jId);
+    getBalance(message.author.id).then(balance => {
+        if (balance == null) {
+            initializeCash(message.author.id, message.author.username);
+            message.channel.send(`${message.author.username} has $10000.00`);
+        }
+        message.channel.send(`${balance.discordName} has $${balance.bank.toFixed(2)}`);
+    })
+}
 
-    MongoClient.connect(mongoUrl, function(err, client) {
-        client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
-            { discordId: member.user.id, discordName: member.user.username }, 
-            {
-                $setOnInsert: { bank: 10000 }
-            },
-            { 
-                projection: { bank: 1 },
-                new: true,
-                upsert: true,
-                returnOriginal: false 
-            },
-            function (err, result){
-            message.channel.send(`You have $${result.value.bank}`);
-            client.close();
-        })
-    });
+async function getBalance(id) {
+    let client = await MongoClient.connect(mongoUrl);
+    let balance = await client.db(mongoDbName).collection('dls_gambling').findOne({ discordId: id });
+    await client.close();
+    return balance;
 }
 
 function initializeCash(jId, jName) {
@@ -275,7 +292,7 @@ function initializeCash(jId, jName) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
         { discordId: jId, discordName: jName }, 
         { 
-            $setOnInsert: { bank: 10000 },
+            $setOnInsert: { bank: Number(process.env.DEFAULT_CASH) },
         }, 
         { upsert: true }, 
         function (err, result) {
@@ -300,18 +317,13 @@ function updateAllCash(cash) {
     });
 }
 
-function debtList(message) {
+function debtList(channel, minimum) {
     MongoClient.connect(mongoUrl, function(err, client) {
-        client.db(mongoDbName).collection('dls_gambling').find({bank: { $lt: 0 }}).toArray(function (err, results){
+        client.db(mongoDbName).collection('dls_gambling').find({bank: { $lt: minimum }}).toArray(function (err, results){
             client.close();
             if (results.length > 0)
             {
-                message.channel.send(`The following people are broke and need to leave.\n${results.map(x=>x.discordName).join(', ')}`);
-
-                // results.forEach(function(user) {
-                //     member = message.guild.members.get(user.discordId);
-                //     member.setVoiceChannel('580951382282993679');
-                // })
+                channel.send(`The following people cannot afford the pot and need to leave.\n${results.map(x=>x.discordName).join(', ')}`);
             }
 
             client.close();

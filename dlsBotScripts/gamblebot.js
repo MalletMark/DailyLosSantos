@@ -67,8 +67,8 @@ function gambleDice(message) {
     const pot = Number(message.content.trim().split(' ')[1]);
     if (isNaN(pot)) {
         message.channel.send(`Don't be pepega!`); return;
-    } else if (pot > 1000) {
-        message.channel.send(`$1000 Max!`); return;
+    } else if (pot > 10000) {
+        message.channel.send(`$10000 Max!`); return;
     } else if (pot < 1) {
         message.channel.send(`We don't accept bus tokens...`); return;
     }
@@ -91,6 +91,7 @@ function gambleDice(message) {
                         gambler['id'] = user.id;
                         gambler['roll'] = diceRoll(1, 100)[0];
                         sGamblers.push(gambler);
+                        initializeCash(user.id, user.username);
                     }
                 });
             });
@@ -248,10 +249,11 @@ function updateCash(dId, cash) {
 
 function getCash(message) {
     const jId = message.content.substring(5).split('<@')[1].split('>')[0].replace('!','');
+    const member = message.guild.members.get(jId);
 
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
-            { discordId: jId }, 
+            { discordId: member.user.id, discordName: member.user.username }, 
             {
                 $setOnInsert: { bank: 10000 }
             },
@@ -318,7 +320,7 @@ function debtList(message) {
 }
 
 function channelCheck(message) {
-    if (message.channel.name != 'office-of-kevin-shaw') {
+    if (message.channel.name != 'shaw-office-of-kevin-law') {
         message.channel.send(`Please visit <#${process.env.SHAW_OFFICE_ID}>`);
         return false;
     }

@@ -131,7 +131,7 @@ function gambleRace(message) {
         setOptionsReact(sMessage, 0, 4);
         const filter = (reaction, user) => ({});
         
-        sMessage.awaitReactions(filter, { time: 10000 })
+        sMessage.awaitReactions(filter, { time: 30000 })
         .then((collected) => {
             var sGamblers = [];
             

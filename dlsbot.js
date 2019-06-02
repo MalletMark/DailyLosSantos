@@ -105,6 +105,8 @@ client.on('message', message => {
         GambleBot.kick_broke(message);
     } else if (message.content.substring(0, 5) === '!cash' && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.getCash(message);
+    } else if (message.content.substring(0, 15) === '!gamble_leaders' && process.env.GAMBLEBOT == 'TRUE') {
+        GambleBot.leader_board(message);
     } else {
         if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {
             recordBot(message);

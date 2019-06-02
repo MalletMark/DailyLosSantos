@@ -31,6 +31,9 @@ module.exports = {
     end: function(message) {
         endEvent(message);
     },
+    leader_board: function(message) {
+        leaderBoard(message);
+    },
     give_all: function(message) {
         updateAllCash(Number(message.content.split(' ')[1]));
     },
@@ -364,9 +367,26 @@ function endEvent(message) {
     });
 }
 
+function leaderBoard(message) {
+    MongoClient.connect(mongoUrl, function(err, client) {
+        client.db(mongoDbName).collection('dls_gambling_leaders').find({}).sort({date_won: -1}).limit(10).toArray(function (err, results) {
+            
+            var embed = new RichEmbed()
+            .setTitle('Recent Gambling Leaders')
+            .setColor(0xFF25C0)
+            .setDescription(results.reduce(function(winners, gambler) {
+                return winners += `${gambler.discordName} won with a total of $${gambler.bank}\n`;
+            }, ""))
+            .setFooter(`Catch a game at #shaw-office-of-kevin-law when the room is open!`);
+
+            message.channel.send(embed)
+        });
+    });
+}
+
 function debtList(channel, minimum) {
     MongoClient.connect(mongoUrl, function(err, client) {
-        client.db(mongoDbName).collection('dls_gambling').find({bank: { $lt: minimum }}).toArray(function (err, results){
+        client.db(mongoDbName).collection('dls_gambling_leaders').find({bank: { $lt: minimum }}).toArray(function (err, results){
             client.close();
             if (results.length > 0)
             {

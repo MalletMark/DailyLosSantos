@@ -93,7 +93,7 @@ client.on('message', message => {
         recordBot(message);
     } else if (message.content.substring(0, 5) === '!roll') {
         GambleBot.roll(message);
-    } else if (message.content.substring(0, 12) === '!gamble_dide' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
+    } else if (message.content.substring(0, 12) === '!gamble_dice' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.gamble_dice(message);
     } else if (message.content.substring(0, 12) === '!gamble_race' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.gamble_race(message);

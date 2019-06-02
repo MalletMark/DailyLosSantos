@@ -99,7 +99,7 @@ client.on('message', message => {
         GambleBot.gamble_race(message);
     } else if (message.content.substring(0, 5) === '!cash' && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.getCash(message);
-    } else if (message.content.substring(0, 12) === '!gamble_kick' && process.env.GAMBLEBOT == 'TRUE') {
+    } else if (message.content.substring(0, 12) === '!gamble_kick' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.kick_broke(message);
     } else {
         if (recorders.includes(message.author.id) && process.env.RECORDBOT == 'TRUE') {

@@ -41,7 +41,7 @@ client.on('message', message => {
         FooBar.foo(message);
     } else if (message.content === '!bot') {
         botHelp(message);
-    } else if (message.content.substring(0, 11) === '!character ' && process.env.CHARACTERBOT == 'TRUE') {
+    } else if (message.content.substring(0, 11) === '!characted ' && process.env.CHARACTERBOT == 'TRUE') {
         CharacterBot.get(message); //characterBot(message);
     } else if (message.content.substring(0, 16) === '!characterUpdate' && process.env.CHARACTERBOTUPDATE == 'TRUE') {
         CharacterBot.update(message);//characterBotUpdate(message);

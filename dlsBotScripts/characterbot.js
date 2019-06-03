@@ -24,12 +24,13 @@ module.exports = {
 function characterGet(message) {
     if (!channelCheck(message)) return;
 
-    const cName = message.content.substring(11);
+    const cName = message.content.substring(11).trim();
+    const cTags = cName.split(' ').map(x=> new RegExp(x, 'i'));
 
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('nopixel_characters');
 
-        col.find({ name: {'$regex': cName, '$options' : 'i'}}).toArray(function(err, items) {
+        col.find({"name_tags": { $all: cTags }}).toArray(function(err, items) {
             if (err) throw err;
 
             if (items.length == 0)
@@ -77,6 +78,7 @@ function characterAdd(message) {
             {
                 const cObj = {};
                 cObj["name"] = cName;
+                cObj["name_tags"] = cName.split(' ');
                 if (cDesc.length > 0) cObj["description"] = cDesc
 
                 col.insertOne(cObj, function(err, item) {
@@ -101,12 +103,13 @@ function characterUpdate(message) {
     if (!channelCheck(message)) return;
     
     const cName = message.content.split('<')[1].split('>')[0];
+    const cTags = cName.split(' ').map(x=> new RegExp(x, 'i'));
     const cDesc = message.content.split('>')[1].trim();
 
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('nopixel_characters');
 
-        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
+        col.find({"name_tags": { $all: cTags }}).toArray(function(err, items) {
             if (err) throw err;
 
             if (items.length == 1)
@@ -139,17 +142,19 @@ function characterRename(message) {
     if (!channelCheck(message)) return;
     
     const cName = message.content.split('<')[1].split('>')[0];
+    const cTags = cName.split(' ').map(x=> new RegExp(x, 'i'));
     const nName = message.content.split('>')[1].trim();
+    const nTags = cName.split(' ');
 
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('nopixel_characters');
 
-        col.find({ name: {'$regex': cName, '$options' : 'i' }}).toArray(function(err, items) {
+        col.find({"name_tags": { $all: cTags }}).toArray(function(err, items) {
             if (err) throw err;
 
             if (items.length == 1)
             {
-                col.updateOne({ _id: items[0]._id }, { $set: { name: nName }}, function(err, item) {
+                col.updateOne({ _id: items[0]._id }, { $set: { name: nName, name_tags: nTags }}, function(err, item) {
                     if (err) throw err;
 
                     message.channel.send(`Thanks for updating ${items[0].name}'s file!`);

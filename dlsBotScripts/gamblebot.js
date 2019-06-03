@@ -105,8 +105,8 @@ function gambleDice(message) {
         sMessage.awaitReactions(filter, { time: 15000 })
         .then((collected) => {
             gambleDiceCollectAllGamblers(sMessage, collected, pot);
-        }).catch(console.error);
-    }).catch(console.error);
+        }).catch((err) => { liveGame = false; });
+    }).catch((err) => { liveGame = false; });
 }
 
 async function gambleDiceCollectAllGamblers(message, collected, pot) {
@@ -178,7 +178,7 @@ function gambleDiceResults(message, sGamblers, pot) {
                 cashoutList(ids, nMessage.channel, "Contestant Credits");
             }, 1000);
         });
-    }).catch(console.error);
+    }).catch((err) => { liveGame = false; });
 }
 
 function gambleRace(message) {
@@ -202,7 +202,7 @@ function gambleRace(message) {
         .then((collected) => {
             gambleRaceCollectAllGamblers(sMessage, collected, pot);
         })
-        .catch(console.error);
+        .catch((err) => { liveGame = false; });
     });
 }
 

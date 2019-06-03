@@ -158,8 +158,10 @@ function gambleDiceResults(message, sGamblers, pot) {
     
         message.channel.send(embed).then((nMessage) => {
             setTimeout(function(){
-                debtList(nMessage.channel, pot);
-            }, 2000);
+                const ids = Array.from(new Set(sGamblers.map(x=>x.id)))
+
+                cashoutList(ids, nMessage.channel, "Contestant Credits");
+            }, 1000);
         });
     }).catch(console.error);
 }
@@ -274,20 +276,14 @@ function updateHorseEmbed(sGamblers, pot, horseStatus, message) {
         })
         
         var potWinnings = (winnerCount > 0) ? Number((pot * sGamblers.length) / winnerCount) : Number(pot * sGamblers.length);
-        updateGamblers(pot, potWinnings, 2, winnerCount, sGamblers);
-        console.log(sGamblers);
-
-        setTimeout(() => {
+        updateGamblers(pot, potWinnings, 2, winnerCount, sGamblers).then(() => {
             const winningMsg = (winnerCount > 0) ? 
             `${sGamblers.filter(x=>x.roll == 2).map(z=>z.username).join(', ')} has won $${potWinnings}` :
             'No winners today :( \n!cash to check you balance';
-            
-            message.channel.send(winningMsg).then((nMessage) => {
-                setTimeout(function(){
-                    debtList(nMessage.channel, pot);
-                }, 2000);
-            });
-        }, 1000);
+            const ids = Array.from(new Set(sGamblers.map(x=>x.id)))
+
+            cashoutList(ids,message.channel, winningMsg);
+        });
     }
 }
 
@@ -411,6 +407,23 @@ function leaderBoard(message) {
             message.channel.send(embed)
         });
     });
+}
+
+async function cashoutList(ids, channel, winningMsg) {
+    var balances = [];
+
+    for (let id of ids) {
+        let balance = await getBalance(id);
+        balances.push(`${balance.discordName} has $${balance.bank.toFixed(2)}`);
+    }
+
+    console.log(balances);
+    const embed = new RichEmbed()
+    .setTitle(winningMsg)
+    .setColor(0xFF25C0)
+    .setDescription(balances.join('\n'));
+
+    channel.send(embed);
 }
 
 function debtList(channel, minimum) {

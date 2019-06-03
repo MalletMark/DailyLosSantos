@@ -127,7 +127,7 @@ async function fetchRecapLinks(channel) {
 
 function addRecap(reaction, user) {
     const newRecap = {
-        discordId: user.id,
+        discordId: reaction.message.channel.id,
         created_on: reaction.message.createdAt.toISOString(),
         author: user.username,
         url: reaction.message.url,

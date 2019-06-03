@@ -3,6 +3,7 @@ const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 const fs = require('fs');
+const moment = require('moment');
 
 module.exports = {
     get: function (message) {
@@ -113,7 +114,7 @@ async function fetchRecapLinks(channel) {
         messages.array().every(function(m)
         {
             if (hasReaction(m.reactions.array(), 'recap')) {
-                fs.appendFile(`all_recaps.txt`, `${channel.id + ',' + m.createdAt + ',' + m.author.username + ',' + m.url + ',' + m.content.substring(0, 20)} \r\n`);
+                fs.appendFile(`all_recaps.txt`, `${channel.id + ',' + m.createdAt.toISOString() + ',' + m.author.username + ',' + m.url + ',' + m.content.substring(0, 20)} \r\n`);
             }
             return true;
         });
@@ -128,7 +129,7 @@ async function fetchRecapLinks(channel) {
 function addRecap(reaction, user) {
     const newRecap = {
         discordId: user.id,
-        created_on: reaction.message.createdAt,
+        created_on: reaction.message.createdAt.toISOString(),
         author: user.username,
         url: reaction.message.url,
         messagePeek: reaction.message.content.substring(0, 20)
@@ -138,5 +139,45 @@ function addRecap(reaction, user) {
         client.db(mongoDbName).collection('dls_recaps').insertOne(newRecap,  function (err, result) {
             client.close();
         });
+    });
+}
+
+function recapGet2(message) {
+    const recapNum = 10;
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        client.db(mongoDbName).collection('dls_recaps').find({}).sort({date_won: -1}).limit(10).toArray(function (err, results) {
+            
+            var embed = new RichEmbed()
+            .setTitle('Recent Gambling Leaders')
+            .setColor(0xFF25C0)
+            .setDescription(results.reduce(function(winners, gambler) {
+                return winners += `${gambler.discordName} won with a total of $${gambler.bank}\n`;
+            }, ""))
+            .setFooter(`Catch a game at #shaw-office-of-kevin-law when the room is open!`);
+
+            message.channel.send(embed)
+        });
+    });
+
+    fetchRecaps(message.channel, recapNum)
+    .then(messagesQueue => {
+        if (messagesQueue.length > 0)
+        {
+            messagesQueue.reverse();
+            const rc = (messagesQueue.length > 1) ? messagesQueue.length.toString() + ' recaps' : 'recap'
+            const messagesFormatted = messagesQueue.map(m => `[${m.content.substring(0, 20)}... by ${m.author.username}](${m.url})`);
+
+            const embed = new RichEmbed()
+            .setTitle(`Here are the last ${rc} I could find!`)
+            .setColor(0x0008FF)
+            .setDescription(messagesFormatted.join('\n'));
+
+            message.channel.send(embed);
+        }
+        else
+        {
+            message.channel.send('No recaps found :(');
+        }
     });
 }

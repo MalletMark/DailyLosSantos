@@ -182,11 +182,11 @@ function gambleRace(message) {
         message.channel.send(`We don't accept bus tokens...`); return;
     }
 
-    message.channel.send(`Horses are at the ready! \nHit that react to choose your (1) racer to bet ${pot}\nRace starts in 30 seconds!`).then((sMessage) => {
+    message.channel.send(`Horses are at the ready! \nHit that react to choose your (1) racer to bet ${pot}\nRace starts in 20 seconds!`).then((sMessage) => {
         setRaceOptions(sMessage, 0, 4);
         const filter = (reaction, user) => raceAnimals.includes(reaction.emoji.name);
         
-        sMessage.awaitReactions(filter, { time: 5000 })
+        sMessage.awaitReactions(filter, { time: 20000 })
         .then((collected) => {
             gambleRaceCollectAllGamblers(sMessage, collected, pot);
         })

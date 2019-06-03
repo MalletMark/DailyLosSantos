@@ -3,7 +3,6 @@ const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 const fs = require('fs');
-const moment = require('moment');
 
 module.exports = {
     get: function (message) {

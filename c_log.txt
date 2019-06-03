@@ -1,0 +1,291 @@
+!character siz
+!characterAdd <wdd> testinfo
+!character siz
+!character siz
+!character jospeh
+!character nino
+!characterUpdate <simon l harth> (Redacted)
+!character simon l harth
+!character simon
+!character zelda
+!character Jacob L Harth
+!character mother
+!character siz
+!character siz
+!character Siz
+!character Siz
+!character Ron Otterman
+!character Ron
+!characterUpdate <Ron Otterman> He is the lead news anchor of Weazel News
+!character Ron Otterman
+!characterAdd <Ron Otterman>
+!character Ron
+!character Ron
+!characterAdd <Ron Otterman>
+!character Ron Otterman
+!character Ron
+!character Dab
+!characterUpdate <Yung Dab> Dab is the most dangerous soundcloud rapper that Los Santos has ever seen. More info needed!
+!character Yung Dab
+!character Max
+!character Yung Dab
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!character Yung Dab
+!characterUpdate <Yung Dab> dab is the GNOME!
+!character Yung Dab
+!characterUpdate <Yung Dab> dab is the GNOME!
+!character Yung Dab
+!character Yung Dab
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!character Yung Dab
+!character Yung Dab
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!characterUpdate <Yung Dab> Maxie is a gnome lol
+!character Yung Dab
+!character Yung Dab
+!character <Yung Dab>
+!character Marshall
+!character <Marshall Fisher>
+!character <al>
+!character <Agnes>
+!character <agnes>
+!character <al>
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!characters
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character
+!character Siz
+!character Vinny
+!character Vinny
+!character Vinny Canoozle
+!character
+!character big d
+!character Ripley
+!character Nora Dupres
+!character Nora Dupres
+!character yung dab
+!characterUpdate <Yung Dab> Previously a Harvard grad astrophysicist from Liberty City, Dab left his family to become the most dangerous soundcloud rapper that Los Santos has ever seen. Although he has dabbled in cocaine distribution, lockpicked vaults and broken Chang out of jail, he is unable to simple arithmetic, most notable Dab's Quandry is named after him due to this.
+!character Gladys
+!character Jack Nova
+!character Yung Dab
+!character Dab
+!character Riker
+!characterUpdate <Jonathan Riker> An intern for weasel news, loves to make sex jokes
+!character Riker
+!characterAdd <Jonathan Riker> An intern for weasel news, loves to make sex jokes
+!character Hubcap Jones
+!characterAdd <Hubcap Jones>
+!character Hubcap
+!character Lees Grey
+!character kevin whipaloo
+!characterUpdate <Kevin Whipaloo> Kevin came to Los Santos to get away from his dad. What he found was that wearing yellow will get you shot, and working for the biggest coke kingpin will get you rich. He believes in honest wine and zero crime as the second in command to the winery. He is also very sexually attracted to his grapes and hates bikers. Fuck you, Kelly.. http://www.twitch.tv/sodapoppin
+!character Lees Gray
+!character Kelly
+!character kevin whipaloo
+!character johnnie
+!characterUpdate <Kevin Whipaloo> Kevin came to Los Santos to get away from his dad.  What he found was that wearing yellow will get you shot, and working for the biggest coke kingpin will get you rich.  He believes in honest wine and zero crime as the second in command to the winery.  He is also very sexually attracted to his grapes and hates bikers.  Fuck you, Kelly.
+!character Lees Grey
+!character Lees
+!character Maxine
+!character Maxine Jackson
+!character Maxine
+!character Maxine
+!character Jacob L Harth
+!character kevin whipaloo
+!character kevin shaw
+!character Yung Dab
+!character melbert
+!character mel
+!character saint
+!character ziggy
+!character zaddy
+!character wilson
+!character citizen
+!character Johnnie
+!character Choi
+!character choi
+!character Tim Lee
+!characterUpdate <Tim Lee> Tim Ree
+!character Sal Rosenburg
+!characterUpdate <Sal Rosenburg> 51-50'd
+!characterUpdate <Nora Dupres> Defense Attorney who specializes in civil cases. Partnered with DPG Law. https://twitch.tv/JPKMoto
+!character mother
+!character siz
+!character siz
+!character siz
+!character Nora Dupres
+!character siz
+!character Siz
+!character Nora Dupres
+!character nora
+!characterUpdate <Siz> Siz is the black sheep of Mother's family. He is most notable for the gruesome red birth mark covering half his face. He was mentored by Yung Dab. Reckless, impulsive, and selfish, Siz flips a coin when he must make a decision under pressure. https://twitch.tv/UberHaxorNova
+!character siz
+!characterUpdate <Jason Bidwell> Senior Deputy Jason Bidwell, BCSO, Badge #310. Bidwell is the current 10-50 champion across all of the Los Santos Police Departments https://twitch.tv/minusFive
+!character bidwell
+!characterUpdate <Steve 'Stevie' Mathis> Steve is Mother's adopted child. He shows her devotion and loyalty for giving him the means to survive in Los Santos. He used to work for Facebook before Sayid fired him; now he runs guns and weed for the Family. https://twitch.tv/GloryD
+!characterUpdate <Tony Corleone> Member of the Lean Bois, self-rated #1 driver in Los Santos, and the 4th grandson of Schrooge McDuck. He's currently married to Tori Corleone nee Bologna. https://www.twitch.tv/anthonyz
+!character Tony Corleone
+!character stevie
+!character Tony Corleone
+!character tony
+!characterUpdate <Vinny Pistone> Owner of PDM and sugar daddy of the Chang Gang. Currently facing a large court case that could see his life turned upside down. https://www.twitch.tv/shotz
+!character vinny
+!characterUpdate <Kiki Chanel> Fashion cop extraordinaire, owner and proprietor of Kiki's Organic Clothing. She has a four inch long distended clitoris and has given birth to an actual child. https://twitch.tv/MiltonTPike1
+!character chang
+!characterUpdate <Wang Chang> Now legally named Mr Chang. A Puerto Rican dragon that speaks Chowean and Porkageez. Has ascended to the 6th Realm with his best friend and arch nemesis Uchiha Jones. Founding member of Chang Gang. https://www.twitch.tv/lord_kebun
+!character uchiha
+!characterUpdate <Uchiha> Uchiha is a cyborg fuckbot who hails from Kansas, Japan. He comes from an inbred clan murdered by his sensei. He came to Los Santos looking for his sensei, and get his shoko slobbed by sakura-chans. His greatest enemy and friend (lover?) is Chang. https://twitch.tv/cyr
+!character uchiha
+!character chang
+!character Mother
+!character Uchiha Jones
+!character Uchiha
+!character Uchiha
+!characterUpdate <Mother> ALIVE Evita Nimm, known as Mother, is a wannabe queenpin who acts towards her subordinates in a motherly manner. She has gathered sons (Uchiha, Stevie, Siz, and Rick) and daughters (Vivi and Maxine). She is working with Jacob doing business using the dark web. https://twitch.tv/kiwo
+!character Mother
+!character Brenda
+!character
+!characterUpdate
+!characterUpdate <Brenda Pancake> Receptionist at Pillbox Medical. She is awkward and craves friendship, but comes off as an asshole sometimes. Brenda's career driven and hardworking. She's somehow romantically involved with everyone. https://twitch.tv/ashlynn
+!character Brenda
+!characterUpdate <Brenda Pancake> Receptionist at Pillbox Medical. She is awkward and craves friendship, but comes off as an asshole sometimes. Brenda's career driven and hardworking. She's somehow involved with everyone romantically
+!character Brenda
+!character dex
+!characterUpdate <Uchiha Jones> Uchiha is a cyborg fuckbot who hails from Kansas, Japan. He comes from an inbred clan murdered by his sensei. He came to Los Santos looking for his sensei, and get his shoko slobbed by sakura-chans. His greatest enemy and friend (lover?) is Chang.
+!character Chang
+!characterUpdate <Uchiha Jones> Uchiha is a cyborg fuckbot who hails from Kansas, Japan. He comes from an inbred clan murdered by his sensei. He came to Los Santos looking for his sensei, and get his shoko slobbed by sakura-chans. His greatest enemy and lover is Chang.
+!characterUpdate <Dr Isaac> The "Good" Dr. Isaac is a resident of Pillbox Medical Center. He's one of the best, treating any and all patients. His Achilles Heel is that he despises nearly every citizen of Lost Santos, except for Trooper Copper and his brother, Norman Bones. Don't ask too much about his past, or things might get bloody.
+!characterUpdate <DrIsaac> The "Good" Dr. Isaac is a resident of Pillbox Medical Center. He's one of the best, treating any and all patients. His Achilles Heel is that he despises nearly every citizen of Lost Santos, except for Trooper Copper and his brother, Norman Bones. Don't ask too much about his past, or things might get bloody.
+!characterUpdate <Dr. Isaac> The "Good" Dr. Isaac is a resident of Pillbox Medical Center. He's one of the best, treating any and all patients. His Achilles Heel is that he despises nearly every citizen of Lost Santos, except for Trooper Copper and his brother, Norman Bones. Don't ask too much about his past, or things might get bloody.
+!characterUpdate <Kai King> Dr. King is a senior attendant doctor at Pillbox Medical Hospital. King escaped his life of crime in London and started anew in Los Santos. He fears his dangerous, dark past might catch up to him someday.
+!character Viktor
+!character Isaac
+!characterUpdate <Norman Bones> Norman Bones is one of the numerous lawyers that reside in Los Santos, but he's not in town often. He's also a serial killer, thinking of himself as Death, the only walking god. He is brothers with Dr. Isaac, which is unknown to anyone else in the city. Death comes for us all in the end.
+!character Kai King
+!character Norman
+!characterUpdate <Siz Fulker> Siz is the black sheep of Mother's family. He is most notable for the gruesome red birth mark covering half his face. He was mentored by Yung Dab. Reckless, impulsive, and selfish, Siz flips a coin when he must make a decision under pressure.
+!characterUpdate <Kevin Shaw> Kevin Law-FUCK- Kevin Shaw, Attorney at Law! He's known as one of the best lawyers in Los Santos, but also as a gambling addict, and one of the many Drift Kings. Don't be afraid to make fun of his stupid ass moustache!
+!characterUpdate <Jospeh> Proclaimed son of God and younger/older brother of Jesus Christ. His ability to bless others with stronger cars and resistance to STDs has given the criminal underworld a new hope. His arrival in Los Santos has increased church attendance by 200%.
+!character Siz
+!characterAdd <Steve 'Stevie' Mathis> Steve is Mother's adopted child. He shows her devotion and loyalty for giving him the means to survive in Los Santos. He used to work for Facebook before Sayid fired him; now he runs guns and weed for the Family.
+!characterUpdate <Steve 'Stevie' Mathis> Steve is Mother's adopted child. He shows her devotion and loyalty for giving him the means to survive in Los Santos. He used to work for Facebook before Sayid fired him; now he runs guns and weed for the Family.
+!character Shaw
+!character saint
+!characterAdd <Saint Jospeh>
+!character jospeh
+!characterUpdate <Emma Dupont> Senior Trooper, SASP, Badge #206. Dupont is the most badass, take-no-shit, catch-your-ass Trooper in the San Andreas State Police force. She can read you your rights in English and French, but probably wont if you ask. She doesn't wanna waste that kind of time.
+!character Eugene
+!characterUpdate <Kiki Chanel> Fashion cop extraordinaire, owner and proprietor of Kiki's Organic Clothing. She has a four inch long distended clitoris and has given birth to an actual child.
+!characterUpdate <Melbert R> Member of the Prune Gang, poorest resident of Los Santos, and an owner of a Lamborghini. He's violent when intoxicated with cocaine.
+!character Dupont
+!characterUpdate <Eugene Zuckerberg> Leader of the Prune Gang, Veteran of 38 World Wars and Inventor of the Frisbee. He is grandfather of many children in Los Santos, and is often seen behind a mask in bank robberies and creating chaos with his brother in crime Mel
+!character mel
+!characterUpdate <Conan Clarkson> "Park Ranger", Badge #???. Clarkson is legally a Park Ranger, but according to Lt. Buggs, he "hasn't performed the ritual on the mountain" to be a REAL Park Ranger. Clarkson is most recognizable by his Park Ranger truck that no one else on the force drives.
+!characterUpdate <Mask> A mysterious individual who relies on his mask for survival. Hangs out with the Joker. His adopted daughter is Erin Cox.
+!characterUpdate <Lang Buddha> Member of the Lean Bois, city-rated worst driver in Los Santos, and the greatest generator of scuff anyone has ever seen. Any heists including him has a 80% chance of success and 90% chance of scuff!
+!character Mask
+!characterUpdate <Nora Dupres> Defense Attorney who specializes in civil cases. Partnered with DPG Law.
+!character buddha
+!character Clarkson
+!character Eugene
+!character Soze
+!characterUpdate <Tony Corleone> Member of the Lean Bois, self-rated #1 driver in Los Santos, and the 4th grandson of Schrooge McDuck. He's currently married to Tori Corleone nee Bologna
+!characterUpdate <Bobby Smith> Cadet Deputy, BCSO, Badge #599. Smith is most notable because of his extremely monotone, totally uniform way of speech.  However, now being cleared for solo patrol, he's been seen a more aggressive to anyone that isn't on the force.
+!character Smith
+!character Archer
+!characterUpdate <Ziggy Buggs> Lieutenant, Park Ranger, BCSO, Badge #322. His official title is Lieutenant Ziggy Buggs, Head of the Blaine County Sheriff's Office, King of the Mountain, Lord of the Murder Kitties. He's also the oldest on the force since his birthday, somehow, is every day.
+!character Ziggy
+!characterUpdate <Stephen McClane> Officer, LSPD, Badge #???. McClane is one of the newer officers added to the force, and he fits in well. He's doing great, don't worry, he's already broken 183 windshields, which is lower than the usual amount by this time!
+!character McClane
+!character Williams
+!characterUpdate <Jack Ripley> Lieutenant , SASP, Badge #202. Where you see Ripley, you should also look out for Zero, LSPD's only K-9 and a very good boy. Despite how harsh he and his accent may seem, Ripley is the biggest sweetheart in the LSPD. You could get out of any ticket by having a nice conversation with him. Don't mention how many times he's been shot, though.
+!character Ripley
+!character Angel
+!characterUpdate <Kareem Lyon> Assistant Chief of Police, Badge #???. Don't mess with Kareem, because he's not afraid to mess back. He's also not afraid to ruin your dignity in record time, so be respectful to Kareem.
+!characterUpdate <Kareen Lyon> Assistant Chief of Police, Badge #???. Don't mess with Kareem, because he's not afraid to mess back. He's also not afraid to ruin your dignity in record time, so be respectful to Kareem.
+!character Kareem
+!characterUpdate <Dante Wolf> Detective, Badge #104. Recently promoted from LSPD, Detective Wolf is most likely in that suspicious looking unmarked Crown Vic down on Lean Street. Don't worry, he'll only follow you for a few more hours. Also, definitely not a Gnome.
+!character Yung Dab
+!characterUpdate <Yung Dab> Dab is the most dangerous soundcloud rapper that Los Santos has ever seen.
+
+Recap 1:  https://pastebin.com/Tvjj8cWg 
+Recap 2: https://pastebin.com/52cCmgZq
+!character Wolf
+!characterUpdate <Zelda> (Redacted)
+!character Zelda
+!characterUpdate <Jackie Snow> Chief of Police, Head of CID, Badge #105. Chief Snow represents the entire police force well, until you catch him on the side of the Los Santos Freeway filled with glass shards and watching a burning police cruiser in the distance.
+!characterUpdate <Jason Bidwell> Senior Deputy Jason Bidwell (310) of the BCSO is the current 10-50 champion across all of the Los Santos Police Departments
+!character Bidwell
+!characterAdd <Jason Bidwell> Senior Deputy Jason Bidwell (310) of the BCSO is the current 10-50 champion across all of the Los Santos Police Departments
+!characterAdd <Griselda 'Zelda' Harth>  (Redacted)
+!characterDelete <Zelda L Harth>
+!characterAdd <Zelda L Harth> (Redacted)
+!characterAdd <Simon L Harth> (Redacted)
+!character Simon L Harth
+!character Simon
+!characterUpdate <Simon L Harth> (Redacted)
+!character harth
+!characterUpdate <Harth> (Redacted)
+!character harth
+!character Jackie Snow
+!character Baggs
+!characterUpdate <Trish Baggs>  Trish is a weird, nasty woman who is Mel's wife. She often talks in weird nonsequitors, and gets trapped in various machines in the city. She has really tough skin, like a carapace.
+!character Snow
+!character Jacob
+!character Harth
+!character Jacob
+!character Chang
+!character Brenda
+!characterUpdate <Brenda Pancake> Involved with mulitple men.
+!character Brenda
+!character Brenda
+!character Pancakes
+!character breadna
+!character brenda
+!character Evita
+!character Mother
+!characterUpdate <Evita 'Mother' Nimm>  *ALIVE* Evita Nimm, known as Mother, is a wannabe queenpin who acts towards her subordinates in a motherly manner. She has gathered sons (Uchiha, Stevie, Siz, and Rick) and daughters (Vivi and Maxine). She is working with Jacob doing business using the dark web.
+!character Mother
+!characterUpdate <Brenda Pancake> The hospital receptionist everyone loves to hate. Also known as Breadna. Patient zero for UTIs.
+!character Evita 'Mother' Nimm
+!characterUpdate <Evita 'Mother' Nimm> is a tasty snacc
+!character Brenda
+!character Mother
+!character Bogg
+!character Buck
+!character Tyrone
+!character Ron Otterman
+!character FakeGuy123
+!character Ronin Robertson
+!character Ron
+!character Siz
+!characterUpdate <Siz Fulker> One of mother's children
+!character Siz

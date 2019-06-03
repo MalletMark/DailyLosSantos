@@ -51,7 +51,7 @@ client.on('message', message => {
         CharacterBot.rename(message);//characterBotAdd(message);
     } else if (message.content.substring(0, 16) === '!characterRemove' && hasPerm(message) && process.env.CHARACTERBOTADD == 'TRUE') {
         CharacterBot.remove(message);//characterBotAdd(message);
-    } else if (message.content.substring(0,6) === '!recap' && process.env.RECAPBOT == 'TRUE') {
+    } else if (message.content.substring(0, 7) === '!recap ' && process.env.RECAPBOT == 'TRUE') {
         RecapBot.get(message);
     } else if (message.content.substring(0, 6) === '!quote' &&
         message.content.indexOf('<') > 0 && 
@@ -121,6 +121,8 @@ client.on('message', message => {
 client.on('messageReactionAdd', (reaction, user) => {
     if (reaction.emoji.name === '🎲') {
         GambleBot.initCash(user.id, user.username);
+    } else if (reaction.emoji.name === 'recap') {
+        RecapBot.add(reaction, user);
     }
 });
 

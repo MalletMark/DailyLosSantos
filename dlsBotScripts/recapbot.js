@@ -2,10 +2,17 @@ const { Client, RichEmbed } = require('discord.js');
 const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
+const fs = require('fs');
 
 module.exports = {
     get: function (message) {
         recapGet(message);
+    },
+    getAll: function(client) {
+        recapGetAll(client);
+    },
+    add: function(reaction, user) {
+        addRecap(reaction, user);
     }
 };
 
@@ -32,6 +39,16 @@ function recapGet(message) {
             message.channel.send('No recaps found :(');
         }
     });
+}
+
+function recapGetAll(client) {
+    client.channels.forEach((channel) => {
+        console.log(channel);
+        fetchRecapLinks(channel)
+        .then(messagesQueue => {
+            message.channel.send('Complete!');
+        });
+    })
 }
 
 function hasReaction(reactions, emojiName)
@@ -75,4 +92,51 @@ async function fetchRecaps(channel, recapNum) {
     }
 
     return messagesQueue;
+}
+
+async function fetchRecapLinks(channel) {
+    let last_id;
+
+    while (true)
+    {
+        if (channel.id == 571916072639397888 || channel.id == 572269032376369152 || 
+            channel.id == 571762021716983862 || channel.id == 581136851654541331 ||
+            channel.id == 584432389783158801 || channel.id == 575553207099719681 ||
+            channel.id == 576866269211656223) break;
+
+        const options = { limit : 100 };
+        if (last_id) {
+            options.before = last_id;
+        }
+
+        const messages = await channel.fetchMessages(options);
+        messages.array().every(function(m)
+        {
+            if (hasReaction(m.reactions.array(), 'recap')) {
+                fs.appendFile(`all_recaps.txt`, `${channel.id + ',' + m.createdAt + ',' + m.author.username + ',' + m.url + ',' + m.content.substring(0, 20)} \r\n`);
+            }
+            return true;
+        });
+        last_id = messages.last().id;
+
+        if (messages.size != 100) {
+            break;
+        }
+    }
+}
+
+function addRecap(reaction, user) {
+    const newRecap = {
+        discordId: user.id,
+        created_on: reaction.message.createdAt,
+        author: user.username,
+        url: reaction.message.url,
+        messagePeek: reaction.message.content.substring(0, 20)
+    };
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        client.db(mongoDbName).collection('dls_recaps').insertOne(newRecap,  function (err, result) {
+            client.close();
+        });
+    });
 }

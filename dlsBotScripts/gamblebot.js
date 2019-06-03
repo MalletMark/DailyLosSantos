@@ -35,6 +35,9 @@ module.exports = {
     end: function(message) {
         endEvent(message);
     },
+    liveGame: function() {
+        resetLiveGame();
+    },
     leader_board: function(message) {
         leaderBoard(message);
     },
@@ -88,11 +91,11 @@ function gambleDice(message) {
 
     const pot = Number(message.content.trim().split(' ')[1]);
     if (isNaN(pot)) {
-        message.channel.send(`Don't be pepega!`); return;
+        message.channel.send(`Don't be pepega!`); liveGame = false; return;
     } else if (pot > 10000) {
-        message.channel.send(`$10000 Max!`); return;
+        message.channel.send(`$10000 Max!`); liveGame = false; return;
     } else if (pot < 1) {
-        message.channel.send(`We don't accept bus tokens...`); return;
+        message.channel.send(`We don't accept bus tokens...`); liveGame = false; return;
     }
 
     message.channel.send(`Boom, Wool Dat Shit! \nHit that dice reaction to join and bet ${pot}\nRoll starts in 15 seconds!`).then((sMessage) => {
@@ -143,7 +146,10 @@ async function gambleDiceGambler(sGamblers, user, pot) {
 }
 
 function gambleDiceResults(message, sGamblers, pot) {
-    if (sGamblers.length == 0) return;
+    if (sGamblers.length == 0) {
+        liveGame = false;
+        return;
+    }
 
     console.log(sGamblers);
     sGamblers.sort(function(a, b){ return b.roll >= a.roll });
@@ -181,11 +187,11 @@ function gambleRace(message) {
 
     const pot = Number(message.content.trim().split(' ')[1]);
     if (isNaN(pot)) {
-        message.channel.send(`Don't be pepega!`); return;
+        message.channel.send(`Don't be pepega!`); liveGame = false; return;
     } else if (pot > 10000) {
-        message.channel.send(`$10000 Max!`); return;
+        message.channel.send(`$10000 Max!`); liveGame = false; return;
     } else if (pot < 1) {
-        message.channel.send(`We don't accept bus tokens...`); return;
+        message.channel.send(`We don't accept bus tokens...`); liveGame = false; return;
     }
 
     message.channel.send(`Horses are at the ready! \nHit that react to choose your (1) racer to bet ${pot}\nRace starts in 20 seconds!`).then((sMessage) => {
@@ -310,7 +316,7 @@ async function updateGamblers(pot, potWinnings, highScore, numWinners, sGamblers
 }
 
 function updateCash(dId, cash) {
-    if (dId == null) return;
+    if (dId == null) { liveGame = false; return; }
 
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
@@ -496,4 +502,8 @@ function gameCheck(message) {
 
     liveGame = true;
     return true;
+}
+
+function resetLiveGame() {
+    liveGame = false;
 }

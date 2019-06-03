@@ -103,6 +103,8 @@ client.on('message', message => {
         GambleBot.start(message);
     } else if (message.content.substring(0, 12) === '!gamble_kick' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.kick_broke(message);
+    } else if (message.content.substring(0, 12) === '!gamble_live' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
+        GambleBot.liveGame();
     } else if (message.content.substring(0, 9) === '!giveCash' && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.giveCash(client, message);
     } else if (message.content.substring(0, 5) === '!cash' && process.env.GAMBLEBOT == 'TRUE') {

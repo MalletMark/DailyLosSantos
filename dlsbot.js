@@ -93,9 +93,9 @@ client.on('message', message => {
         recordBot(message);
     } else if (message.content.substring(0, 5) === '!roll') {
         GambleBot.roll(message);
-    } else if (message.content.substring(0, 12) === '!gamble_dice' && process.env.GAMBLEBOT == 'TRUE') {
+    } else if (message.content.substring(0, 12) === '!gamble_dide' && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.gamble_dice(message);
-    } else if (message.content.substring(0, 12) === '!gamble_race' && process.env.GAMBLEBOT == 'TRUE') {
+    } else if (message.content.substring(0, 12) === '!gamble_rade' && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.gamble_race(message);
     } else if (message.content.substring(0, 11) === '!gamble_end' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.end(message);
@@ -104,7 +104,7 @@ client.on('message', message => {
     } else if (message.content.substring(0, 12) === '!gamble_kick' && hasPerm(message) && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.kick_broke(message);
     } else if (message.content.substring(0, 9) === '!giveCash' && process.env.GAMBLEBOT == 'TRUE') {
-        GambleBot.giveCash(message);
+        GambleBot.giveCash(client, message);
     } else if (message.content.substring(0, 5) === '!cash' && process.env.GAMBLEBOT == 'TRUE') {
         GambleBot.getCash(message);
     } else if (message.content.substring(0, 15) === '!gamble_leaders' && process.env.GAMBLEBOT == 'TRUE') {
@@ -231,7 +231,7 @@ function jailBot(message) {
 
     const mChannel = message.guild.channels.find(ch => ch.name === "moderation-log");
     const jOfficer = message.author.username;
-    const jName = message.content.substring(5).split('<@')[1].split('>')[0];
+    const jName = message.content.substring(5).split('<@')[1].split('>')[0].replace('!','');
     const jMonths = Number(message.content.substring(5).trim().split('-')[0].split(' ')[1]);
     const jReason = message.content.substring(5).trim().split('-')[1];
     const jUser = client.users.find("id", jName);

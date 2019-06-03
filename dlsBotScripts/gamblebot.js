@@ -17,8 +17,8 @@ module.exports = {
     getCash: function(message) {
         getCash(message);
     },
-    giveCash: function(message) {
-        giveCash(message);
+    giveCash: function(client, message) {
+        giveCash(client, message);
     },
     gamble_dice: function(message) {
         gambleDice(message);
@@ -127,14 +127,16 @@ async function gambleDiceGambler(sGamblers, user, pot) {
     var gambler = {};
 
     if (sGamblers.filter(x=>x.username == user[1].username).length == 0) {
-        if (balance == null) {
+        if (balance == null)
             initializeCash(user[1].id, user[1].username);
-        }
-        else if (balance.bank >= pot) {
-            gambler['username'] = user[1].username;
-            gambler['id'] = user[1].id;
-            gambler['roll'] = diceRoll(1, 100)[0];
-        }
+        if (balance.bank < pot) 
+            return null;
+        
+        gambler['username'] = user[1].username;
+        gambler['id'] = user[1].id;
+        gambler['roll'] = diceRoll(1, 100)[0];
+    } else {
+        return null;
     }
 
     return gambler;
@@ -143,6 +145,7 @@ async function gambleDiceGambler(sGamblers, user, pot) {
 function gambleDiceResults(message, sGamblers, pot) {
     if (sGamblers.length == 0) return;
 
+    console.log(sGamblers);
     sGamblers.sort(function(a, b){ return b.roll >= a.roll });
 
     const highScore = sGamblers[0].roll;
@@ -332,10 +335,11 @@ function getCash(message) {
     })
 }
 
-function giveCash(message) {
+function giveCash(client, message) {
     const giver = message.author.id;
     const receiver = message.content.trim().split(' ')[1].split('<@')[1].split('>')[0].replace('!','');
-    const cash =  message.content.trim().split(' ')[2];
+    const rName = client.users.find("id", receiver).username;
+    const cash = Number(message.content.trim().split(' ')[2]);
 
     if (isNaN(cash)) {
         message.channel.send('No pepega!'); return;
@@ -344,7 +348,7 @@ function giveCash(message) {
     }
 
     getBalance(giver).then((balance) => {
-        if (balance < cash) {
+        if (balance.bank < cash) {
             message.channel.send('No pepega!'); return;
         } else {
             if (balance == null)
@@ -352,6 +356,7 @@ function giveCash(message) {
 
             updateCash(giver, -cash);
             updateCash(receiver, cash);
+            message.channel.send(`${message.author.username} has given ${rName} $${cash}`);
         }
     })
 }
@@ -406,6 +411,7 @@ function startEvent(message) {
     }
 
     eventDefault = pot;
+    liveGame = false;
     setAllCash(eventDefault);
 }
 

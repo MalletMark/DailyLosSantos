@@ -162,7 +162,7 @@ function gambleDiceResults(message, sGamblers, pot) {
 
         message.channel.send(embed).then((nMessage) => {
             setTimeout(function(){
-                const ids = Array.from(new Set(sGamblers.map(x=>x.id)))
+                const ids = Array.from(new Set(sGamblers.map(x=>x.id))).filter(x => x != null);
                 cashoutList(ids, nMessage.channel, "Contestant Credits");
             }, 1000);
         });
@@ -284,7 +284,7 @@ function updateHorseEmbed(sGamblers, pot, horseStatus, message) {
             const winningMsg = (winnerCount > 0) ? 
             `${sGamblers.filter(x=>x.roll == 2).map(z=>z.username).join(', ')} has won $${potWinnings}` :
             'No winners today :( \n!cash to check you balance';
-            const ids = Array.from(new Set(sGamblers.map(x=>x.id)))
+            const ids = Array.from(new Set(sGamblers.map(x=>x.id))).filter(x => x != null);
 
             liveGame = false;
 
@@ -304,6 +304,8 @@ async function updateGamblers(pot, potWinnings, highScore, numWinners, sGamblers
 }
 
 function updateCash(dId, cash) {
+    if (dId == null) return;
+    
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
         { discordId: dId }, 

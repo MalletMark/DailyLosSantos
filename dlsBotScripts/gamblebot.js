@@ -334,8 +334,8 @@ function getCash(message) {
 
 function giveCash(message) {
     const giver = message.author.id;
-    const receiver = message.message.content.trim().split(' ')[1].split('<@')[1].split('>')[0].replace('!','');
-    const cash =  message.message.content.trim().split(' ')[2];
+    const receiver = message.content.trim().split(' ')[1].split('<@')[1].split('>')[0].replace('!','');
+    const cash =  message.content.trim().split(' ')[2];
 
     if (isNaN(cash)) {
         message.channel.send('No pepega!'); return;

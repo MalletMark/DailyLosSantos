@@ -180,40 +180,55 @@ function gambleRace(message) {
         setRaceOptions(sMessage, 0, 4);
         const filter = (reaction, user) => ({});
         
-        sMessage.awaitReactions(filter, { time: 30000 })
+        sMessage.awaitReactions(filter, { time: 5000 })
         .then((collected) => {
-            var sGamblers = [];
-            
-            collected.array().forEach(function(react) {
-                var sUsers = react.users.filter(u => u.id != '575569539027304448');
-                var gambler = {};
-
-                for (const user of sUsers) {
-                    getBalance(user[1].id).then(balance => {
-                        if (sGamblers.filter(x=>x.username == user[1].username).length == 0) {
-                            if (balance == null) {
-                                initializeCash(user[1].id, user[1].username);
-                            }
-                            else if (balance.bank >= pot) { 
-                                var gambler = {};
-                                gambler['username'] = user[1].username;
-                                gambler['id'] = user[1].id;
-                                gambler['horse'] = raceAnimals.indexOf(react.emoji.name);
-                                sGamblers.push(gambler);
-                            }
-                        }
-                    });
-                }
-            });
-
-            var horseStatus = [0, 0, 0, 0];
-            sMessage.channel.send('The Race has Started!').then((nMessage) => {
-                setTimeout(function(){
-                    updateHorseEmbed(sGamblers, pot, horseStatus, nMessage)
-                }, 2000);
-            });
+            gambleRaceCollectAllGamblers(sMessage, collected, pot);
         })
         .catch(console.error);
+    });
+}
+
+async function gambleRaceGambler(animal, user, pot) {
+    let balance = await getBalance(user.id);
+    var gambler = {};
+
+    if (balance == null) {
+        initializeCash(user.id, user.username);
+    }
+    else if (balance.bank < pot) {
+        return gambler;
+    }
+
+    gambler['username'] = user.username;
+    gambler['id'] = user.id;
+    gambler['horse'] = raceAnimals.indexOf(animal);
+
+    return gambler;
+}
+
+async function gambleRaceCollectAllGamblers(message, collected, pot) {
+    var sGamblers = [];
+
+    for (let react of collected.array()) {
+        var sUsers = react.users.filter(u => u.id != '575569539027304448');
+
+        for (let user of sUsers) {
+             let gambler = await gambleRaceGambler(react.emoji.name, user[1], pot);
+             if (gambler != null) sGamblers.push(gambler);
+        }
+    };
+
+    console.log(sGamblers);
+    gambleRaceRun(message, sGamblers, pot);
+}
+
+function gambleRaceRun(message, sGamblers, pot){
+    var horseStatus = [0, 0, 0, 0];
+
+    message.channel.send('The Race has Started!').then((nMessage) => {
+        setTimeout(function(){
+            updateHorseEmbed(sGamblers, pot, horseStatus, nMessage)
+        }, 1300);
     });
 }
 

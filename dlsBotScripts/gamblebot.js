@@ -17,6 +17,9 @@ module.exports = {
     getCash: function(message) {
         getCash(message);
     },
+    giveCash: function(message) {
+        giveCash(message);
+    },
     gamble_dice: function(message) {
         gambleDice(message);
     },
@@ -305,7 +308,7 @@ async function updateGamblers(pot, potWinnings, highScore, numWinners, sGamblers
 
 function updateCash(dId, cash) {
     if (dId == null) return;
-    
+
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
         { discordId: dId }, 
@@ -326,6 +329,30 @@ function getCash(message) {
             message.channel.send(`${message.author.username} has $${(eventDefault > 0) ? eventDefault : process.env.DEFAULT_CASH}`);
         }
         message.channel.send(`${balance.discordName} has $${balance.bank.toFixed(2)}`);
+    })
+}
+
+function giveCash(message) {
+    const giver = message.author.id;
+    const receiver = message.message.content.trim().split(' ')[1].split('<@')[1].split('>')[0].replace('!','');
+    const cash =  message.message.content.trim().split(' ')[2];
+
+    if (isNaN(cash)) {
+        message.channel.send('No pepega!'); return;
+    } else if (cash < 1) {
+        message.channel.send('No pepega!'); return;
+    }
+
+    getBalance(giver).then((balance) => {
+        if (balance < cash) {
+            message.channel.send('No pepega!'); return;
+        } else {
+            if (balance == null)
+                initializeCash(message.author.id, message.author.username);
+
+            updateCash(giver, -cash);
+            updateCash(receiver, cash);
+        }
     })
 }
 

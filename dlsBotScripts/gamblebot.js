@@ -5,6 +5,7 @@ const mongoDbName = 'dls';
 const voteOptions = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺'];
 const raceAnimals = ['🐎', '🐕', '🐅', '🐐'];
 var eventDefault = 0;
+var liveGame = false;
 
 module.exports = {
     roll: function (message) {
@@ -80,6 +81,7 @@ function rollBot(message) {
 
 function gambleDice(message) {
     if (!channelCheck(message)) return;
+    if (!gameCheck(message)) return;
 
     const pot = Number(message.content.trim().split(' ')[1]);
     if (isNaN(pot)) {
@@ -156,10 +158,11 @@ function gambleDiceResults(message, sGamblers, pot) {
         }, ""))
         .setFooter('!cash to check you balance');
     
+        liveGame = false;
+
         message.channel.send(embed).then((nMessage) => {
             setTimeout(function(){
                 const ids = Array.from(new Set(sGamblers.map(x=>x.id)))
-
                 cashoutList(ids, nMessage.channel, "Contestant Credits");
             }, 1000);
         });
@@ -168,6 +171,7 @@ function gambleDiceResults(message, sGamblers, pot) {
 
 function gambleRace(message) {
     if (!channelCheck(message)) return;
+    if (!gameCheck(message)) return;
 
     const pot = Number(message.content.trim().split(' ')[1]);
     if (isNaN(pot)) {
@@ -180,7 +184,7 @@ function gambleRace(message) {
 
     message.channel.send(`Horses are at the ready! \nHit that react to choose your (1) racer to bet ${pot}\nRace starts in 30 seconds!`).then((sMessage) => {
         setRaceOptions(sMessage, 0, 4);
-        const filter = (reaction, user) => ({});
+        const filter = (reaction, user) => raceAnimals.includes(reaction.emoji.name);
         
         sMessage.awaitReactions(filter, { time: 5000 })
         .then((collected) => {
@@ -281,6 +285,8 @@ function updateHorseEmbed(sGamblers, pot, horseStatus, message) {
             `${sGamblers.filter(x=>x.roll == 2).map(z=>z.username).join(', ')} has won $${potWinnings}` :
             'No winners today :( \n!cash to check you balance';
             const ids = Array.from(new Set(sGamblers.map(x=>x.id)))
+
+            liveGame = false;
 
             cashoutList(ids,message.channel, winningMsg);
         });
@@ -444,5 +450,15 @@ function channelCheck(message) {
         return false;
     }
 
+    return true;
+}
+
+function gameCheck(message) {
+    if (liveGame) {
+        message.channel.send('A game is already in progress');
+        return false;
+    }
+
+    liveGame = true;
     return true;
 }

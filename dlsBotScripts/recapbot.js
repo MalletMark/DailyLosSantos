@@ -160,7 +160,7 @@ function recapGet2(message) {
                 .setDescription(messagesFormatted.join('\n'));
                 // .setFooter("1");
 
-                // message.channel.send(embed).then((nMessage) => {
+                message.channel.send(embed); //.then((nMessage) => {
                 //     addIteratorReaction(nMessage);
                 // }).catch({});
             }

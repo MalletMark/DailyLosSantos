@@ -24,12 +24,13 @@ module.exports = {
 function characterGet(message) {
     if (!channelCheck(message)) return;
 
-    const cName = message.content.substring(11);
+    const cName = message.content.substring(11).trim();
+    const cTags = cName.split(' ').map(x=> new RegExp(x, 'i'));
 
     MongoClient.connect(mongoUrl, function(err, client) {
         const col = client.db(mongoDbName).collection('nopixel_characters');
 
-        col.find({ name: {'$regex': cName, '$options' : 'i'}}).toArray(function(err, items) {
+        col.find({"name_tags": { $all: cTags }}).toArray(function(err, items) {
             if (err) throw err;
 
             if (items.length == 0)

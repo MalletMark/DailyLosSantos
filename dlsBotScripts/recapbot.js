@@ -157,19 +157,19 @@ function recapGet2(message) {
                 const embed = new RichEmbed()
                 .setTitle(`Here are the last ${rc} I could find! (starting from most recent)`)
                 .setColor(0x0008FF)
-                .setDescription(messagesFormatted.join('\n'));
-                // .setFooter("1");
+                .setDescription(messagesFormatted.join('\n'))
+                .setFooter("1");
 
-                message.channel.send(embed); //.then((nMessage) => {
-                //     addIteratorReaction(nMessage);
-                // }).catch({});
+                message.channel.send(embed).then((nMessage) => {
+                    addIteratorReaction(nMessage);
+                }).catch({});
             }
             else
             {
-                message.channel.send('No recaps found :(');
-                // .then((nMessage) => {
-                //     addIteratorReaction(nMessage);
-                // });
+                message.channel.send('No recaps found :(')
+                .then((nMessage) => {
+                    addIteratorReaction(nMessage);
+                });
             }
         });
     });

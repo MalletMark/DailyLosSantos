@@ -145,7 +145,7 @@ function addRecap(reaction, user) {
     const newRecap = {
         discordId: reaction.message.channel.id,
         created_on: reaction.message.createdAt.toISOString(),
-        author: user.username,
+        author: reaction.message.author.username,
         url: reaction.message.url,
         messagePeek: reaction.message.content.substring(0, 20)
     };

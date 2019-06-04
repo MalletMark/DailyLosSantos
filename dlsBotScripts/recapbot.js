@@ -11,11 +11,11 @@ module.exports = {
     getAll: function(client) {
         recapGetAll(client);
     },
-    add: function(reaction, user) {
-        addRecap(reaction, user);
+    add: function(reaction) {
+        addRecap(reaction);
     },
-    remove: function(reaction, user) {
-        removeRecap(reaction, user);
+    remove: function(reaction) {
+        removeRecap(reaction);
     },
     iterate: function(react) {
         recapIterate(react);
@@ -131,8 +131,8 @@ async function fetchRecapLinks(channel) {
     }
 }
 
-function removeRecap(reaction, user) {
-    const query = { discordId: reaction.message.channel.id ,created_on: reaction.message.createdAt.toISOString() };
+function removeRecap(reaction) {
+    const query = { discordId: reaction.message.channel.id, url: reaction.message.url };
 
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_recaps').deleteOne(query,  function (err, result) {
@@ -141,7 +141,7 @@ function removeRecap(reaction, user) {
     });
 }
 
-function addRecap(reaction, user) {
+function addRecap(reaction) {
     const newRecap = {
         discordId: reaction.message.channel.id,
         created_on: reaction.message.createdAt.toISOString(),
@@ -151,7 +151,23 @@ function addRecap(reaction, user) {
     };
 
     MongoClient.connect(mongoUrl, function(err, client) {
-        client.db(mongoDbName).collection('dls_recaps').insertOne(newRecap,  function (err, result) {
+        client.db(mongoDbName).collection('dls_recaps').findOneAndUpdate(
+            { discordId: reaction.message.channel.id, url: reaction.message.url },
+            newRecap,  
+            function (err, result) {
+                client.close();
+            }
+        );
+    });
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
+        { discordId: jId, discordName: jName }, 
+        { 
+            $setOnInsert: { bank: (eventDefault > 0) ? eventDefault : Number(process.env.DEFAULT_CASH) },
+        }, 
+        { upsert: true }, 
+        function (err, result) {
             client.close();
         });
     });

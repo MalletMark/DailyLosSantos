@@ -152,7 +152,7 @@ client.on('messageReactionAdd', (reaction, user) => {
     if (reaction.emoji.name === '🎲') {
         GambleBot.initCash(user.id, user.username);
     } else if (reaction.emoji.name === 'recap') {
-        RecapBot.add(reaction, user);
+        RecapBot.add(reaction);
     } else if (['👈','👉'].includes(reaction.emoji.name) && user.id != '575569539027304448') {
         RecapBot.iterate(reaction);
     }
@@ -160,7 +160,7 @@ client.on('messageReactionAdd', (reaction, user) => {
 
 client.on('messageReactionRemove', (reaction, user) => {
     if (reaction.emoji.name === 'recap') {
-        RecapBot.remove(reaction, user);
+        RecapBot.remove(reaction);
     } else if (['👈','👉'].includes(reaction.emoji.name) && user.id != '575569539027304448') {
         RecapBot.iterate(reaction);
     }

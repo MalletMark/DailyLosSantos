@@ -170,20 +170,19 @@ function recapGet2(message) {
                 const embed = new RichEmbed()
                 .setTitle(`Here are the last ${rc} I could find! (starting from most recent)`)
                 .setColor(0x0008FF)
-                .setDescription(messagesFormatted.join('\n'));
-                //.setFooter("1");
+                .setDescription(messagesFormatted.join('\n'))
+                .setFooter("1");
 
-                message.channel.send(embed);
-                // .then((nMessage) => {
-                //     addIteratorReaction(nMessage);
-                // }).catch({});
+                message.channel.send(embed).then((nMessage) => {
+                    addIteratorReaction(nMessage);
+                }).catch({});
             }
             else
             {
-                message.channel.send('No recaps found :(');
-                // .then((nMessage) => {
-                //     addIteratorReaction(nMessage);
-                // });
+                message.channel.send('No recaps found :(')
+                .then((nMessage) => {
+                    addIteratorReaction(nMessage);
+                });
             }
         });
     });
@@ -195,33 +194,35 @@ async function addIteratorReaction(message) {
 
 function recapIterate(react) {
     const channelId = react.message.channel.id;
-    let pageNum = Number(react.message.embeds[0].footer);
+    var pageNum = Number(react.message.embeds[0].footer.text);
     var inc = 0;
 
-    if (react._emoji.name == '')
-        inc = 1;
-    else if (react._emoji.name == '')
+    if (react._emoji.name == '👈')
         inc = -1;
+    else if (react._emoji.name == '👉')
+        inc = 1;
 
-    pageNum += inc;
-    pageNum = (pageNum < 0) ? 0 : pageNum;
-    const pNum = pageNum;
+    pageNum = ((pageNum + inc) < 0) ? 0 : pageNum + inc;
 
-    MongoClient.connect(mongoUrl, function(err, client) {
-        client.db(mongoDbName).collection('dls_recaps').find({discordId: channelId}).sort({date_won: -1}).skip(10*pNum).limit(10).toArray(function (err, results) {
-            if (results.length > 0)
-            {
-                const rc = (results.length > 1) ? results.length.toString() + ' recaps' : 'recap'
-                const messagesFormatted = results.map(m => `[${m.peek}... by ${m.author}](${m.url})`);
+    editRecapEmbed(channelId, pageNum).then((results) => {
+        if (results.recaps.length > 0) {
+            const rc = (results.recaps.length > 1) ? results.recaps.length.toString() + ' recaps' : 'recap'
+            const messagesFormatted = results.recaps.map(m => `[${m.peek}... by ${m.author}](${m.url})`);
 
-                const embed = new RichEmbed()
-                .setTitle(`Here are the most recent ${rc} I could find!`)
-                .setColor(0x0008FF)
-                .setDescription(messagesFormatted.join('\n'))
-                .setFooter(pNum);
+            const embed = new RichEmbed()
+            .setTitle(`Here are the most recent ${rc} I could find!`)
+            .setColor(0x0008FF)
+            .setDescription(messagesFormatted.join('\n'))
+            .setFooter(results.pageNum);
 
-                react.message.edit(embed);
-            }
-        });
+            react.message.edit(embed);
+        }
     });
+}
+
+async function editRecapEmbed(channelId, pageNum) {
+    let db = await MongoClient.connect(mongoUrl);
+    let recaps = db.db(mongoDbName).collection('dls_recaps').find({discordId: channelId}).sort({date_won: -1}).skip(10*pageNum).limit(10).toArray();
+    await db.close();
+    return { recaps: recaps, pageNum: pageNum };
 }

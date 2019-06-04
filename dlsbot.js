@@ -56,7 +56,7 @@ client.on('message', message => {
         CharacterBot.rename(message);//characterBotAdd(message);
     } else if (message.content.substring(0, 16) === '!characterRemove' && hasPerm(message) && process.env.CHARACTERBOTADD == 'TRUE') {
         CharacterBot.remove(message);//characterBotAdd(message);
-    } else if (message.content.substring(0, 6) === '!recat' && process.env.RECAPBOT == 'TRUE') {
+    } else if (message.content.substring(0, 6) === '!recap' && process.env.RECAPBOT == 'TRUE') {
         RecapBot.get(message);
     } else if (message.content.substring(0, 6) === '!recad' && false) {
         RecapBot.getAll(client);
@@ -154,9 +154,9 @@ client.on('messageReactionAdd', (reaction, user) => {
     } else if (reaction.emoji.name === 'recap') {
         RecapBot.add(reaction, user);
     } 
-    // else if (['👈','👉'].includes(reaction.emoji.name) && user.id != '575569539027304448') {
-    //     RecapBot.iterate(reaction);
-    // }
+    else if (['👈','👉'].includes(reaction.emoji.name) && user.id != '575569539027304448') {
+        RecapBot.iterate(reaction);
+    }
 });
 
 client.on('messageReactionRemove', (reaction, user) => {

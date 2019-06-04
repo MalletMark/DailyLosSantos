@@ -213,7 +213,7 @@ function recapIterate(react) {
             .setTitle(`Here are the most recent ${rc} I could find!`)
             .setColor(0x0008FF)
             .setDescription(messagesFormatted.join('\n'))
-            .setFooter(results.pageNum);
+            .setFooter(results.pageNum.toString());
 
             react.message.edit(embed);
         }

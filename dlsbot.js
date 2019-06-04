@@ -53,6 +53,8 @@ client.on('message', message => {
         CharacterBot.remove(message);//characterBotAdd(message);
     } else if (message.content.substring(0, 6) === '!recap' && process.env.RECAPBOT == 'TRUE') {
         RecapBot.get(message);
+    } else if (message.content.substring(0, 6) === '!recad' && false) {
+        RecapBot.getAll(client);
     } else if (message.content.substring(0, 6) === '!quote' &&
         message.content.indexOf('<') > 0 && 
         message.content.indexOf('>') > 0 && process.env.QUOTEBOT == 'TRUE') {

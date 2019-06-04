@@ -155,7 +155,7 @@ function recapGet2(message) {
                 const messagesFormatted = results.map(m => `[${m.peek}... by ${m.author}](${m.url})`);
                 
                 const embed = new RichEmbed()
-                .setTitle(`Here are the last ${rc} I could find! (from most recent to latest)`)
+                .setTitle(`Here are the last ${rc} I could find! (starting from most recent)`)
                 .setColor(0x0008FF)
                 .setDescription(messagesFormatted.join('\n'));
                 // .setFooter("1");

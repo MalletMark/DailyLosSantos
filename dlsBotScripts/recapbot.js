@@ -147,7 +147,7 @@ function addRecap(reaction) {
         created_on: reaction.message.createdAt.toISOString(),
         author: reaction.message.author.username,
         url: reaction.message.url,
-        messagePeek: reaction.message.content.substring(0, 20)
+        peek: reaction.message.content.substring(0, 20)
     };
 
     MongoClient.connect(mongoUrl, function(err, client) {
@@ -159,7 +159,7 @@ function addRecap(reaction) {
                     created_on: reaction.message.createdAt.toISOString(),
                     author: reaction.message.author.username,
                     url: reaction.message.url,
-                    messagePeek: reaction.message.content.substring(0, 20)
+                    peek: reaction.message.content.substring(0, 20)
                 }
             },  
             { upsert: true }, 
@@ -233,7 +233,7 @@ function recapIterate(react) {
 async function getRecapEmbed(channelId, pageNum) {
     let db = await MongoClient.connect(mongoUrl);
     let totalPages = await db.db(mongoDbName).collection('dls_recaps').find({discordId: channelId}).toArray();
-    let recapsFound = await db.db(mongoDbName).collection('dls_recaps').find({discordId: channelId}).sort({date_won: -1}).skip(10*pageNum).limit(10).toArray();
+    let recapsFound = await db.db(mongoDbName).collection('dls_recaps').find({discordId: channelId}).sort({created_on: -1}).skip(10*pageNum).limit(10).toArray();
     await db.close();
     return { recaps: recapsFound, pageNum: pageNum, totalPages: Math.ceil(totalPages.length/10) };
 }

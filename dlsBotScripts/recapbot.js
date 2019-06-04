@@ -14,6 +14,9 @@ module.exports = {
     add: function(reaction, user) {
         addRecap(reaction, user);
     },
+    remove: function(reaction, user) {
+        removeRecap(reaction, user);
+    },
     iterate: function(react) {
         recapIterate(react);
     }
@@ -45,6 +48,8 @@ function recapGet(message) {
 }
 
 function recapGetAll(client) {
+    const approvedChannels = []
+
     client.channels.forEach((channel) => {
         console.log(channel);
         fetchRecapLinks(channel)
@@ -102,10 +107,8 @@ async function fetchRecapLinks(channel) {
 
     while (true)
     {
-        if (channel.id == 571916072639397888 || channel.id == 572269032376369152 || 
-            channel.id == 571762021716983862 || channel.id == 581136851654541331 ||
-            channel.id == 584432389783158801 || channel.id == 575553207099719681 ||
-            channel.id == 576866269211656223) break;
+        if (channel.parent == null) break;
+        if (channel.parent.name != "Event Discussions" && channel.parent.name != "Faction Recaps") break;
 
         const options = { limit : 100 };
         if (last_id) {
@@ -116,7 +119,7 @@ async function fetchRecapLinks(channel) {
         messages.array().every(function(m)
         {
             if (hasReaction(m.reactions.array(), 'recap')) {
-                fs.appendFile(`all_recaps.txt`, `${channel.id + ',' + m.createdAt.toISOString() + ',' + m.author.username + ',' + m.url + ',' + m.content.substring(0, 20)} \r\n`);
+                fs.appendFile(`all_recaps.txt`, `${channel.id + '|' + m.createdAt.toISOString() + '|' + m.author.username + '|' + m.url + '|' + m.content.substring(0, 20)} \r\n`);
             }
             return true;
         });
@@ -126,6 +129,16 @@ async function fetchRecapLinks(channel) {
             break;
         }
     }
+}
+
+function removeRecap(reaction, user) {
+    const query = { discordId: reaction.message.channel.id ,created_on: reaction.message.createdAt.toISOString() };
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        client.db(mongoDbName).collection('dls_recaps').deleteOne(query,  function (err, result) {
+            client.close();
+        });
+    });
 }
 
 function addRecap(reaction, user) {

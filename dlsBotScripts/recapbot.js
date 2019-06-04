@@ -173,16 +173,11 @@ function recapGet2(message) {
                 .setDescription(messagesFormatted.join('\n'))
                 .setFooter("1");
 
-                message.channel.send(embed).then((nMessage) => {
-                    addIteratorReaction(nMessage);
-                }).catch({});
+                message.channel.send(embed);
             }
             else
             {
-                message.channel.send('No recaps found :(')
-                .then((nMessage) => {
-                    addIteratorReaction(nMessage);
-                });
+                message.channel.send('No recaps found :(');
             }
         });
     });

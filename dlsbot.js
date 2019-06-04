@@ -153,9 +153,6 @@ client.on('messageReactionAdd', (reaction, user) => {
         GambleBot.initCash(user.id, user.username);
     } else if (reaction.emoji.name === 'recap') {
         RecapBot.add(reaction, user);
-    } 
-    else if (['👈','👉'].includes(reaction.emoji.name) && user.id != '575569539027304448') {
-        RecapBot.iterate(reaction);
     }
 });
 

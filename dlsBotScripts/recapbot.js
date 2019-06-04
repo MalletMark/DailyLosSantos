@@ -153,23 +153,20 @@ function addRecap(reaction) {
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_recaps').findOneAndUpdate(
             { discordId: reaction.message.channel.id, url: reaction.message.url },
-            newRecap,  
+            { 
+                $setOnInsert: {
+                    discordId: reaction.message.channel.id,
+                    created_on: reaction.message.createdAt.toISOString(),
+                    author: reaction.message.author.username,
+                    url: reaction.message.url,
+                    messagePeek: reaction.message.content.substring(0, 20)
+                }
+            },  
+            { upsert: true }, 
             function (err, result) {
                 client.close();
             }
         );
-    });
-
-    MongoClient.connect(mongoUrl, function(err, client) {
-        client.db(mongoDbName).collection('dls_gambling').findOneAndUpdate(
-        { discordId: jId, discordName: jName }, 
-        { 
-            $setOnInsert: { bank: (eventDefault > 0) ? eventDefault : Number(process.env.DEFAULT_CASH) },
-        }, 
-        { upsert: true }, 
-        function (err, result) {
-            client.close();
-        });
     });
 }
 

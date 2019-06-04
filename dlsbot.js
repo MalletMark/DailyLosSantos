@@ -47,15 +47,15 @@ client.on('message', message => {
     } else if (message.content === '!bot') {
         botHelp(message);
     } else if (message.content.substring(0, 11) === '!character ' && process.env.CHARACTERBOT == 'TRUE') {
-        CharacterBot.get(message); //characterBot(message);
+        CharacterBot.get(message);
     } else if (message.content.substring(0, 16) === '!characterUpdate' && process.env.CHARACTERBOTUPDATE == 'TRUE') {
-        CharacterBot.update(message);//characterBotUpdate(message);
+        CharacterBot.update(message);
     } else if (message.content.substring(0, 13) === '!characterAdd' && process.env.CHARACTERBOTADD == 'TRUE') {
-        CharacterBot.add(message);//characterBotAdd(message);
+        CharacterBot.add(message);
     } else if (message.content.substring(0, 16) === '!characterRename' && hasPerm(message) && process.env.CHARACTERBOTADD == 'TRUE') {
-        CharacterBot.rename(message);//characterBotAdd(message);
+        CharacterBot.rename(message);
     } else if (message.content.substring(0, 16) === '!characterRemove' && hasPerm(message) && process.env.CHARACTERBOTADD == 'TRUE') {
-        CharacterBot.remove(message);//characterBotAdd(message);
+        CharacterBot.remove(message);
     } else if (message.content.substring(0, 6) === '!recap' && process.env.RECAPBOT == 'TRUE') {
         RecapBot.get(message);
     } else if (message.content.substring(0, 6) === '!recad' && false) {
@@ -153,12 +153,16 @@ client.on('messageReactionAdd', (reaction, user) => {
         GambleBot.initCash(user.id, user.username);
     } else if (reaction.emoji.name === 'recap') {
         RecapBot.add(reaction, user);
+    } else if (['👈','👉'].includes(reaction.emoji.name) && user.id != '575569539027304448') {
+        RecapBot.iterate(reaction);
     }
 });
 
 client.on('messageReactionRemove', (reaction, user) => {
     if (reaction.emoji.name === 'recap') {
         RecapBot.remove(reaction, user);
+    } else if (['👈','👉'].includes(reaction.emoji.name) && user.id != '575569539027304448') {
+        RecapBot.iterate(reaction);
     }
 });
 

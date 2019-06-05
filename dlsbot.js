@@ -153,6 +153,8 @@ client.on('messageReactionAdd', (reaction, user) => {
         GambleBot.initCash(user.id, user.username);
     } else if (reaction.emoji.name === 'recap') {
         RecapBot.add(reaction);
+    } else if (RecapBot.emojis.filter(e => e.emoji == reaction.emoji.name.length > 0)) {
+        RecapBot.addXPost(reaction);
     } else if (['👈','👉'].includes(reaction.emoji.name) && user.id != '575569539027304448') {
         RecapBot.iterate(reaction);
     }
@@ -161,6 +163,8 @@ client.on('messageReactionAdd', (reaction, user) => {
 client.on('messageReactionRemove', (reaction, user) => {
     if (reaction.emoji.name === 'recap') {
         RecapBot.remove(reaction);
+    } else if (RecapBot.emojis.filter(e => e.emoji == reaction.emoji.name.length > 0)) {
+        RecapBot.removeXPost(reaction);
     } else if (['👈','👉'].includes(reaction.emoji.name) && user.id != '575569539027304448') {
         RecapBot.iterate(reaction);
     }

@@ -35,6 +35,12 @@ module.exports = {
     remove: function(reaction) {
         removeRecap(reaction);
     },
+    addXPost: function(reaction) {
+        addXPost(reaction);
+    },
+    removeXPost: function(reaction) {
+        removeXPost(reaction);
+    },
     iterate: function(react) {
         recapIterate(react);
     }

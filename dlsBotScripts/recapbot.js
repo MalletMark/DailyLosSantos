@@ -22,6 +22,7 @@ const xpostKVP = [
 ]
 
 module.exports = {
+    emojis: xpostKVP,
     get: function (message) {
         recapGet2(message);
     },
@@ -220,7 +221,7 @@ function recapGet2(message) {
     getRecapEmbed(channelId, 0).then((results) => {
         if (results.recaps.length > 0) {
             const rc = (results.recaps.length > 1) ? results.recaps.length.toString() + ' recaps' : 'recap'
-            const messagesFormatted = results.recaps.map((m, i) => `[${i+(results.pageNum * 10)+1}. ${m.peek}... by ${m.author} (${m.created_on.substr(5, 2)}/${m.created_on.substr(8, 2)})](${m.url})`);
+            const messagesFormatted = results.recaps.map((m, i) => `[${i+(results.pageNum * 10)+1}. ${m.peek}... by ${m.author} (${m.created_on.substr(5, 2)}/${m.created_on.substr(8, 2)})${(m.xpost ? '(X-Post)': '')}](${m.url})`);
 
             const embed = new RichEmbed()
             .setTitle(`Here are the most recent ${rc} I could find!`)

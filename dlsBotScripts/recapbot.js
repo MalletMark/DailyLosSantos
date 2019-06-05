@@ -4,6 +4,23 @@ const mongoUrl = process.env.MONGODB_CONN;
 const mongoDbName = 'dls';
 const fs = require('fs');
 
+const xpostKVP = [
+    { emoji: 'ballasvagosgrove', channel: 572159949673594891},
+    { emoji: 'bondi', channel: 580795436785467392},
+    { emoji: 'brotherhood', channel: 571775949260193813},
+    { emoji: 'chang', channel: 571773421911015425},
+    { emoji: 'copkillarecords', channel: 576789860497489930},
+    { emoji: 'emsdoctors', channel: 571773574549995521},
+    { emoji: 'leo', channel: 571773491599114251},
+    { emoji: 'koreans', channel: 571774887581057033},
+    { emoji: 'lawyersjudges', channel: 571773643491901440},
+    { emoji: 'leanboys', channel: 571774187769692170},
+    { emoji: 'prune', channel: 571773156629413889},
+    { emoji: 'sahara', channel: 574511711919407106},
+    { emoji: 'winery', channel: 583824089848741901},
+    { emoji: 'unaffiliated', channel: 571775836659908629}
+]
+
 module.exports = {
     get: function (message) {
         recapGet2(message);
@@ -142,14 +159,6 @@ function removeRecap(reaction) {
 }
 
 function addRecap(reaction) {
-    const newRecap = {
-        discordId: reaction.message.channel.id,
-        created_on: reaction.message.createdAt.toISOString(),
-        author: reaction.message.author.username,
-        url: reaction.message.url,
-        peek: reaction.message.content.substring(0, 20)
-    };
-
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_recaps').findOneAndUpdate(
             { discordId: reaction.message.channel.id, url: reaction.message.url },
@@ -167,6 +176,41 @@ function addRecap(reaction) {
                 client.close();
             }
         );
+    });
+}
+
+function addXPost(reaction) {
+    const channelId = xpostKVP.filter(x=>x.emoji == reaction._emoji.name)[0].channel || 0;
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        client.db(mongoDbName).collection('dls_recaps').findOneAndUpdate(
+            { discordId: reaction.message.channel.id, url: reaction.message.url },
+            { 
+                $setOnInsert: {
+                    discordId: channelId,
+                    created_on: reaction.message.createdAt.toISOString(),
+                    author: reaction.message.author.username,
+                    url: reaction.message.url,
+                    peek: reaction.message.content.substring(0, 20),
+                    xpost: true
+                }
+            },  
+            { upsert: true }, 
+            function (err, result) {
+                client.close();
+            }
+        );
+    });
+}
+
+function removeXPost(reaction) {
+    const channelId = xpostKVP.filter(x=>x.emoji == reaction._emoji.name)[0].channel || 0;
+    const query = { discordId: channelId, url: reaction.message.url };
+
+    MongoClient.connect(mongoUrl, function(err, client) {
+        client.db(mongoDbName).collection('dls_recaps').deleteOne(query,  function (err, result) {
+            client.close();
+        });
     });
 }
 

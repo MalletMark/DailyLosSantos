@@ -204,7 +204,18 @@ function addXPost(reaction) {
             },  
             { upsert: true }, 
             function (err, result) {
-                client.close();
+                const embed = new RichEmbed()
+                .setTitle("X-POST from ${reaction.message.channel.name}")
+                .setDescription(`${result.value.peek}... by ${result.value.author} (${result.value.created_on.substr(5, 2)}/${result.value.created_on.substr(8, 2)})](${result.value.url})`);
+
+                reaction.message.guild.channels.get(channelId).send(embed).then((nMessage) => {
+                        client.db(mongoDbName).collection('dls_recaps').updateOne(
+                            { discordId: channelId.toString(), url: reaction.message.url },
+                            { xurl: nMessage.url },
+                            function (err, result) {
+                                client.close();
+                            });
+                    });
             }
         );
     });
@@ -215,8 +226,11 @@ function removeXPost(reaction) {
     const query = { discordId: channelId, url: reaction.message.url };
 
     MongoClient.connect(mongoUrl, function(err, client) {
-        client.db(mongoDbName).collection('dls_recaps').deleteOne(query,  function (err, result) {
-            client.close();
+        client.db(mongoDbName).collection('dls_recaps').findOneAndDelete(query,  function (err, result) {
+            reaction.message.channel.fetchMessage(result.xurl).then((nMessage) => {
+                nMessage.delete();
+                client.close();
+            })
         });
     });
 }
@@ -227,7 +241,8 @@ function recapGet2(message) {
     getRecapEmbed(channelId, 0).then((results) => {
         if (results.recaps.length > 0) {
             const rc = (results.recaps.length > 1) ? results.recaps.length.toString() + ' recaps' : 'recap'
-            const messagesFormatted = results.recaps.map((m, i) => `[${i+(results.pageNum * 10)+1}. ${m.peek}... by ${m.author} (${m.created_on.substr(5, 2)}/${m.created_on.substr(8, 2)})${(m.xpost ? '(X-Post)': '')}](${m.url})`);
+            const messagesFormatted = results.recaps.map((m, i) => 
+                `[${i+(results.pageNum * 10)+1}. ${m.peek}... by ${m.author} (${m.created_on.substr(5, 2)}/${m.created_on.substr(8, 2)})${(m.xpost ? '(X-Post)': '')}](${m.url})`);
 
             const embed = new RichEmbed()
             .setTitle(`Here are the most recent ${rc} I could find!`)

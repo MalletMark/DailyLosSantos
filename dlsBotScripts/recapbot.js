@@ -18,7 +18,8 @@ const xpostKVP = [
     { emoji: 'prune', channel: '571773156629413889'},
     { emoji: 'sahara', channel: '574511711919407106'},
     { emoji: 'winery', channel: '583824089848741901'},
-    { emoji: 'unaffiliated', channel: '571775836659908629'}
+    { emoji: 'unaffiliated', channel: '571775836659908629'},
+    { emoji: 'testemote', channel: '586401969871126538'}
 ]
 
 module.exports = {
@@ -202,20 +203,20 @@ function addXPost(reaction) {
                     xpost: true
                 }
             },  
-            { upsert: true }, 
+            { upsert: true, returnOriginal: false }, 
             function (err, result) {
                 const embed = new RichEmbed()
-                .setTitle("X-POST from ${reaction.message.channel.name}")
-                .setDescription(`${result.value.peek}... by ${result.value.author} (${result.value.created_on.substr(5, 2)}/${result.value.created_on.substr(8, 2)})](${result.value.url})`);
+                .setTitle(`X-POST from ${reaction.message.channel.name}`)
+                .setDescription(`[${result.value.peek}... by ${result.value.author} (${result.value.created_on.substr(5, 2)}/${result.value.created_on.substr(8, 2)})](${result.value.url})`);
 
                 reaction.message.guild.channels.get(channelId).send(embed).then((nMessage) => {
-                        client.db(mongoDbName).collection('dls_recaps').updateOne(
-                            { discordId: channelId.toString(), url: reaction.message.url },
-                            { xurl: nMessage.url },
-                            function (err, result) {
-                                client.close();
-                            });
-                    });
+                    client.db(mongoDbName).collection('dls_recaps').updateOne(
+                        { discordId: channelId.toString(), url: reaction.message.url },
+                        { xurl: nMessage.url },
+                        function (err, result) {
+                            client.close();
+                        });
+                });
             }
         );
     });

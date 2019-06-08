@@ -212,7 +212,7 @@ function addXPost(reaction) {
                 reaction.message.guild.channels.get(channelId).send(embed).then((nMessage) => {
                     client.db(mongoDbName).collection('dls_recaps').updateOne(
                         { discordId: channelId.toString(), url: reaction.message.url },
-                        { xurl: nMessage.url },
+                        { $set: { xurl: nMessage.url, xid: nMessage.id }},
                         function (err, result) {
                             client.close();
                         });
@@ -228,7 +228,7 @@ function removeXPost(reaction) {
 
     MongoClient.connect(mongoUrl, function(err, client) {
         client.db(mongoDbName).collection('dls_recaps').findOneAndDelete(query,  function (err, result) {
-            reaction.message.channel.fetchMessage(result.xurl).then((nMessage) => {
+            reaction.message.guild.channels.get(channelId).fetchMessage(result.value.xid).then((nMessage) => {
                 nMessage.delete();
                 client.close();
             })
